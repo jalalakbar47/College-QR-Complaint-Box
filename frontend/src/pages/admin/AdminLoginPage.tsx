@@ -5,6 +5,8 @@ import {
   Mail,
   KeyRound,
   ArrowRight,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -21,6 +23,7 @@ export const AdminLoginPage: React.FC = () => {
 
   const [email, setEmail] = useState<string>('');
   const [passkey, setPasskey] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -68,8 +71,8 @@ export const AdminLoginPage: React.FC = () => {
         <span className="block text-xs font-bold uppercase tracking-widest text-brand-400 mb-1">
           {ENV.COLLEGE_NAME}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Chief    Proctor    Panel
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-wider sm:tracking-widest">
+          Chief Proctor Panel
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-2">
           Authorized administrative access to campus grievance records
@@ -100,12 +103,26 @@ export const AdminLoginPage: React.FC = () => {
             <div>
               <Input
                 label="Security Passkey / Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={passkey}
                 onChange={(e) => setPasskey(e.target.value)}
                 leftIcon={<KeyRound className="w-4 h-4 text-slate-500" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-slate-400 hover:text-slate-600 focus:outline-none transition-colors p-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-slate-600" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-slate-500" />
+                    )}
+                  </button>
+                }
               />
             </div>
 
