@@ -82,41 +82,35 @@ export const AdminLoginPage: React.FC = () => {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative">
-        <Card className="p-6 sm:p-8 bg-slate-800/90 border border-slate-700 shadow-2xl backdrop-blur-md text-white">
+        <Card className="p-6 sm:p-8 bg-white border border-slate-200/90 shadow-2xl rounded-2xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && (
-              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium">
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
                 {errorMessage}
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Official Admin Email
-              </label>
               <Input
+                label="Official Admin Email"
                 type="email"
                 required
                 placeholder="proctor@college.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
-                className="bg-slate-900/80 border-slate-700 text-white placeholder:text-slate-500 focus:border-brand-400"
+                leftIcon={<Mail className="w-4 h-4 text-slate-500" />}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Security Passkey / Password
-              </label>
               <Input
+                label="Security Passkey / Password"
                 type="password"
                 required
                 placeholder="••••••••"
                 value={passkey}
                 onChange={(e) => setPasskey(e.target.value)}
-                leftIcon={<KeyRound className="w-4 h-4 text-slate-400" />}
-                className="bg-slate-900/80 border-slate-700 text-white placeholder:text-slate-500 focus:border-brand-400"
+                leftIcon={<KeyRound className="w-4 h-4 text-slate-500" />}
               />
             </div>
 
@@ -125,7 +119,7 @@ export const AdminLoginPage: React.FC = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5"
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 shadow-md shadow-brand-500/20"
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
@@ -135,27 +129,27 @@ export const AdminLoginPage: React.FC = () => {
           </form>
 
           {/* Quick Login Helpers for Demo & Testing */}
-          <div className="mt-6 pt-5 border-t border-slate-700/60">
-            <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 text-center">
+          <div className="mt-6 pt-5 border-t border-slate-200">
+            <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 text-center">
               Quick-Fill Demo Credentials
             </span>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickLogin('chiefproctor@college.edu')}
-                className="p-2 rounded-lg bg-slate-900/60 hover:bg-slate-700 border border-slate-700 text-slate-300 text-left transition-colors"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-left transition-all group"
               >
-                <span className="font-bold block text-white text-[11px]">Chief Proctor</span>
-                <span className="text-[10px] text-slate-400 truncate block">chiefproctor@...</span>
+                <span className="font-bold block text-slate-900 group-hover:text-brand-700 text-xs">Chief Proctor</span>
+                <span className="text-[11px] text-slate-500 truncate block mt-0.5">chiefproctor@...</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin('admin@college.edu')}
-                className="p-2 rounded-lg bg-slate-900/60 hover:bg-slate-700 border border-slate-700 text-slate-300 text-left transition-colors"
+                className="p-2.5 rounded-xl bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-left transition-all group"
               >
-                <span className="font-bold block text-white text-[11px]">Admin Staff</span>
-                <span className="text-[10px] text-slate-400 truncate block">admin@college.edu</span>
+                <span className="font-bold block text-slate-900 group-hover:text-brand-700 text-xs">Admin Staff</span>
+                <span className="text-[11px] text-slate-500 truncate block mt-0.5">admin@college.edu</span>
               </button>
             </div>
           </div>
@@ -164,7 +158,7 @@ export const AdminLoginPage: React.FC = () => {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-xs text-slate-400 hover:text-white transition-colors"
+            className="text-xs text-slate-300 hover:text-white font-medium transition-colors inline-flex items-center gap-1 hover:underline"
           >
             ← Return to Student Portal Home
           </Link>
