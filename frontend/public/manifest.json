@@ -1,0 +1,17 @@
+{
+  "short_name": "CampusQR",
+  "name": "College QR Complaint Box",
+  "description": "Secure, fast, and confidential campus grievance and complaint management system.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#0359a1",
+  "display": "standalone",
+  "orientation": "portrait"
+}
