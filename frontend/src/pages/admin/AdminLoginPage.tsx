@@ -19,8 +19,8 @@ export const AdminLoginPage: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
 
-  const [email, setEmail] = useState<string>('chiefproctor@college.edu');
-  const [passkey, setPasskey] = useState<string>('proctor2026');
+  const [email, setEmail] = useState<string>('');
+  const [passkey, setPasskey] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -54,11 +54,6 @@ export const AdminLoginPage: React.FC = () => {
     setIsSubmitting(false);
   };
 
-  const handleQuickLogin = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPasskey('proctor2026');
-  };
-
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 px-4">
       {/* Glow effect */}
@@ -74,7 +69,7 @@ export const AdminLoginPage: React.FC = () => {
           {ENV.COLLEGE_NAME}
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Chief Proctor & Admin Portal
+          Chief    Proctor    Panel
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-2">
           Authorized administrative access to campus grievance records
@@ -123,36 +118,10 @@ export const AdminLoginPage: React.FC = () => {
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                Sign In to Proctor ERP
+                Sign In to Chief Proctor Panel
               </Button>
             </div>
           </form>
-
-          {/* Quick Login Helpers for Demo & Testing */}
-          <div className="mt-6 pt-5 border-t border-slate-200">
-            <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 text-center">
-              Quick-Fill Demo Credentials
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('chiefproctor@college.edu')}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-left transition-all group"
-              >
-                <span className="font-bold block text-slate-900 group-hover:text-brand-700 text-xs">Chief Proctor</span>
-                <span className="text-[11px] text-slate-500 truncate block mt-0.5">chiefproctor@...</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin@college.edu')}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 text-left transition-all group"
-              >
-                <span className="font-bold block text-slate-900 group-hover:text-brand-700 text-xs">Admin Staff</span>
-                <span className="text-[11px] text-slate-500 truncate block mt-0.5">admin@college.edu</span>
-              </button>
-            </div>
-          </div>
         </Card>
 
         <div className="mt-6 text-center">
