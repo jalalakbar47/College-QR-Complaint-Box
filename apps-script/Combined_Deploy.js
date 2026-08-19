@@ -807,6 +807,8 @@ function doGet(e) {
         return createJsonResponse(ConfigService.getCategories());
       case 'getLocations':
         return createJsonResponse(ConfigService.getLocations());
+      case 'adminLogin':
+        return createJsonResponse(AdminService.login(params.email, params.passkey || params.password));
 
       // 2. Protected Admin Endpoints
       case 'getDashboardStats':

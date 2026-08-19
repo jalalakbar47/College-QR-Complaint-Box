@@ -40,6 +40,9 @@ function doGet(e) {
       case 'getLocations':
         return createJsonResponse(ConfigService.getLocations());
 
+      case 'adminLogin':
+        return createJsonResponse(AdminService.login(params.email, params.passkey || params.password));
+
       // ==========================================
       // 2. PROTECTED ADMIN ENDPOINTS (Token required)
       // ==========================================

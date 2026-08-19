@@ -80,14 +80,31 @@ export async function callGasApi<T = any>(
       };
     }
 
-    const responseJson: ApiResponse<T> = await response.json();
+    const rawText = await response.text();
+    let responseJson: ApiResponse<T>;
+    try {
+      responseJson = JSON.parse(rawText);
+    } catch (parseErr) {
+      if (rawText.includes('Sorry, unable to open the file') || rawText.includes('Page not found') || rawText.includes('Google Drive')) {
+        return {
+          success: false,
+          message: 'Google Web App access error: Please verify your Google Apps Script Web App deployment settings ("Who has access: Anyone") or check if you got a new Web App URL.',
+          errorCode: 'GAS_DEPLOYMENT_ERROR',
+        };
+      }
+      return {
+        success: false,
+        message: 'Invalid response received from Google Apps Script backend.',
+        errorCode: 'INVALID_JSON',
+      };
+    }
     return responseJson;
   } catch (error: any) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
       return {
         success: false,
-        message: 'Request timed out. Please check your network connection and try again.',
+        message: 'Request timed out connecting to Google Apps Script. Please verify your Web App deployment URL and internet connection.',
         errorCode: 'TIMEOUT',
       };
     }
