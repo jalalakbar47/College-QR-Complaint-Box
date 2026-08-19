@@ -103,7 +103,27 @@ const Database = {
   ACTIVITY_LOG_HEADERS: ['log_id', 'timestamp', 'admin_id', 'complaint_id', 'action', 'old_value', 'new_value', 'remarks'],
 
   getSpreadsheet: function () {
-    return SpreadsheetApp.getActiveSpreadsheet();
+    try {
+      const active = SpreadsheetApp.getActiveSpreadsheet();
+      if (active) return active;
+    } catch (e) {}
+
+    try {
+      const spId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+      if (spId) {
+        if (spId.indexOf('http') === 0) return SpreadsheetApp.openByUrl(spId);
+        return SpreadsheetApp.openById(spId);
+      }
+    } catch (e) {}
+
+    Logger.log('Standalone script detected. Auto-creating a new "College QR Complaint Box Database" Google Sheet...');
+    const newSheet = SpreadsheetApp.create('College QR Complaint Box Database');
+    const newId = newSheet.getId();
+    try {
+      PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', newId);
+    } catch (e) {}
+    Logger.log('Google Spreadsheet created successfully! URL: ' + newSheet.getUrl());
+    return newSheet;
   },
 
   getSheet: function (sheetName) {

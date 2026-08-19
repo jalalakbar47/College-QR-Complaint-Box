@@ -79,19 +79,30 @@ const Database = {
   ],
 
   /**
-   * Retrieves the active spreadsheet or binds by ID
+   * Retrieves the active spreadsheet, opens configured sheet ID, or auto-creates one
    */
   getSpreadsheet: function () {
     try {
-      return SpreadsheetApp.getActiveSpreadsheet();
-    } catch (e) {
-      // Fallback: If deployed as standalone script, bind via script properties
+      const active = SpreadsheetApp.getActiveSpreadsheet();
+      if (active) return active;
+    } catch (e) {}
+
+    try {
       const spId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
       if (spId) {
+        if (spId.indexOf('http') === 0) return SpreadsheetApp.openByUrl(spId);
         return SpreadsheetApp.openById(spId);
       }
-      throw new Error('Spreadsheet not bound. Open the spreadsheet and attach this script or set SPREADSHEET_ID.');
-    }
+    } catch (e) {}
+
+    Logger.log('Standalone script detected. Auto-creating a new "College QR Complaint Box Database" Google Sheet...');
+    const newSheet = SpreadsheetApp.create('College QR Complaint Box Database');
+    const newId = newSheet.getId();
+    try {
+      PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', newId);
+    } catch (e) {}
+    Logger.log('Google Spreadsheet created successfully! URL: ' + newSheet.getUrl());
+    return newSheet;
   },
 
   /**
