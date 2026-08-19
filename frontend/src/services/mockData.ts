@@ -12,26 +12,6 @@ export const INITIAL_ADMINS: Admin[] = [
     created_at: '2026-01-10T09:00:00.000Z',
     last_login: '2026-08-18T08:15:00.000Z',
   },
-  {
-    admin_id: 'ADM-002',
-    name: 'Admin Office',
-    email: 'admin@college.edu',
-    role: 'Admin',
-    status: 'Active',
-    passkey: 'proctor2026',
-    created_at: '2026-01-15T10:30:00.000Z',
-    last_login: '2026-08-17T16:45:00.000Z',
-  },
-  {
-    admin_id: 'ADM-003',
-    name: 'Campus Security Staff',
-    email: 'security.staff@college.edu',
-    role: 'Staff',
-    status: 'Active',
-    passkey: 'proctor2026',
-    created_at: '2026-02-01T11:00:00.000Z',
-    last_login: '2026-08-18T07:30:00.000Z',
-  },
 ];
 
 export const INITIAL_COMPLAINTS: Complaint[] = [

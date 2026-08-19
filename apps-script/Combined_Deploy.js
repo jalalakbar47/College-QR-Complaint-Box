@@ -97,7 +97,7 @@ const Database = {
     'admin_remarks', 'resolution', 'resolved_at', 'assigned_to'
   ],
 
-  ADMIN_HEADERS: ['admin_id', 'name', 'email', 'role', 'status', 'created_at', 'last_login'],
+  ADMIN_HEADERS: ['admin_id', 'name', 'email', 'role', 'status', 'passkey', 'created_at', 'last_login'],
   CATEGORY_HEADERS: ['category_id', 'category_name', 'description', 'status'],
   LOCATION_HEADERS: ['location_id', 'location_name', 'status'],
   ACTIVITY_LOG_HEADERS: ['log_id', 'timestamp', 'admin_id', 'complaint_id', 'action', 'old_value', 'new_value', 'remarks'],
@@ -224,16 +224,15 @@ const Database = {
       sComplaints.setFrozenRows(1);
     }
 
-    // 2. Admins Sheet
+    // 2. Admins Sheet (Single Default Chief Proctor Account)
     let sAdmins = ss.getSheetByName(this.SHEETS.ADMINS) || ss.insertSheet(this.SHEETS.ADMINS);
     if (sAdmins.getLastRow() === 0) {
       sAdmins.appendRow(this.ADMIN_HEADERS);
       sAdmins.getRange(1, 1, 1, this.ADMIN_HEADERS.length).setBackground('#1e293b').setFontColor('#ffffff').setFontWeight('bold');
       sAdmins.setFrozenRows(1);
 
-      sAdmins.appendRow(['ADM-001', 'Chief Proctor', 'chiefproctor@college.edu', 'Chief Proctor', 'Active', new Date().toISOString(), '']);
-      sAdmins.appendRow(['ADM-002', 'Admin Office', 'admin@college.edu', 'Admin', 'Active', new Date().toISOString(), '']);
-      sAdmins.appendRow(['ADM-003', 'Campus Security Staff', 'security.staff@college.edu', 'Staff', 'Active', new Date().toISOString(), '']);
+      // Default Single Chief Proctor Admin Credentials
+      sAdmins.appendRow(['ADM-001', 'Chief Proctor', 'chiefproctor@college.edu', 'Chief Proctor', 'Active', 'proctor2026', new Date().toISOString(), '']);
     }
 
     // 3. Categories Sheet
@@ -689,6 +688,48 @@ const AdminService = {
     };
   },
 
+  changePassword: function (adminId, currentPassword, newPassword) {
+    if (!adminId || !currentPassword || !newPassword) {
+      return { success: false, message: 'All password fields are mandatory.', errorCode: 'INVALID_INPUT' };
+    }
+
+    const cleanCurrent = String(currentPassword).trim();
+    const cleanNew = String(newPassword).trim();
+
+    if (cleanNew.length < 6) {
+      return { success: false, message: 'New password must be at least 6 characters.', errorCode: 'WEAK_PASSWORD' };
+    }
+
+    const admins = Database.readAll(Database.SHEETS.ADMINS);
+    const admin = admins.find(function (a) {
+      return String(a.admin_id).trim() === String(adminId).trim();
+    });
+
+    if (!admin) {
+      return { success: false, message: 'Admin account not found.', errorCode: 'NOT_FOUND' };
+    }
+
+    const expectedPasskey = admin.passkey ? String(admin.passkey).trim() : 'proctor2026';
+    if (cleanCurrent !== expectedPasskey) {
+      return { success: false, message: 'Current password is incorrect. Please try again.', errorCode: 'INVALID_PASSWORD' };
+    }
+
+    const updateSuccess = Database.updateRow(Database.SHEETS.ADMINS, 'admin_id', adminId, {
+      passkey: cleanNew,
+    });
+
+    if (!updateSuccess) {
+      return { success: false, message: 'Failed to update passkey in spreadsheet.', errorCode: 'WRITE_ERROR' };
+    }
+
+    ActivityLogService.logActivity(adminId, '', 'PASSWORD_CHANGE', '***', '***', 'Proctor updated account security password.');
+
+    return {
+      success: true,
+      message: 'Password changed successfully and updated in Google Sheets.',
+    };
+  },
+
   getDashboardStats: function () {
     const complaints = Database.readAll(Database.SHEETS.COMPLAINTS);
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -873,12 +914,20 @@ function doPost(e) {
       return createJsonResponse(ConfigService.deleteLocation(payload.location_id || payload));
     }
 
+    // Protected Admin POST: Change Password
+    if (action === 'changePassword') {
+      if (!Security.validateToken(token)) {
+        return createJsonResponse({ success: false, message: 'Unauthorized: Valid administrator session token required.', errorCode: 'UNAUTHORIZED' });
+      }
+      return createJsonResponse(AdminService.changePassword(payload.admin_id, payload.current_password, payload.new_password));
+    }
+
     return createJsonResponse({
       success: false,
       message: 'Unknown POST action: ' + action,
       errorCode: 'UNKNOWN_ACTION',
       receivedAction: action,
-      availableActions: ['submitComplaint', 'adminLogin', 'updateComplaint', 'saveCategory', 'deleteCategory', 'saveLocation', 'deleteLocation']
+      availableActions: ['submitComplaint', 'adminLogin', 'updateComplaint', 'saveCategory', 'deleteCategory', 'saveLocation', 'deleteLocation', 'changePassword']
     });
   } catch (error) {
     return createJsonResponse({
@@ -935,7 +984,7 @@ function runFullSecurityAndFunctionalAudit() {
   const trackRes = ComplaintService.trackComplaint(newId);
   assert('trackComplaint is public-safe', trackRes.success && trackRes.data.complaint_id === newId && trackRes.data.admin_remarks === undefined);
 
-  const validLogin = AdminService.login('chiefproctor@college.edu', 'any');
+  const validLogin = AdminService.login('chiefproctor@college.edu', 'proctor2026');
   assert('Valid admin login returns HMAC token', validLogin.success && validLogin.data.token.indexOf('CQB_AUTH_') === 0);
 
   const token = validLogin.data ? validLogin.data.token : '';

@@ -530,6 +530,67 @@ export const apiService = {
   },
 
   /**
+   * Change Administrator Password / Passkey
+   */
+  async changePassword(
+    adminId: string,
+    currentPassword: string,
+    newPassword: string,
+    token?: string
+  ): Promise<ApiResponse<boolean>> {
+    if (ENV.IS_LIVE_API_CONFIGURED) {
+      const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
+      return callGasApi(ENV.API_URL, {
+        method: 'POST',
+        action: 'changePassword',
+        data: {
+          admin_id: adminId,
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        token: sessionToken,
+      });
+    }
+
+    await new Promise((r) => setTimeout(r, 400));
+    const admins = storage.get<Admin[]>(STORAGE_KEY_ADMINS, INITIAL_ADMINS);
+    const index = admins.findIndex((a) => a.admin_id === adminId);
+
+    if (index === -1) {
+      return { success: false, message: 'Admin account not found.', errorCode: 'NOT_FOUND' };
+    }
+
+    const admin = admins[index];
+    const expected = admin.passkey || 'proctor2026';
+    if (currentPassword.trim() !== expected) {
+      return { success: false, message: 'Current password is incorrect. Please try again.', errorCode: 'INVALID_PASSWORD' };
+    }
+
+    if (newPassword.trim().length < 6) {
+      return { success: false, message: 'New password must be at least 6 characters.', errorCode: 'WEAK_PASSWORD' };
+    }
+
+    admins[index] = { ...admin, passkey: newPassword.trim() };
+    storage.set(STORAGE_KEY_ADMINS, admins);
+
+    const logs = getLocalActivityLogs();
+    const newLog: ActivityLog = {
+      log_id: `LOG-${Date.now().toString().slice(-6)}`,
+      timestamp: new Date().toISOString(),
+      admin_id: adminId,
+      admin_name: admin.name,
+      complaint_id: '',
+      action: 'PASSWORD_CHANGE',
+      old_value: '***',
+      new_value: '***',
+      remarks: 'Proctor updated account password.',
+    };
+    saveLocalActivityLogs([newLog, ...logs]);
+
+    return { success: true, message: 'Password changed successfully and saved.', data: true };
+  },
+
+  /**
    * Administrators
    */
   async getAdmins(token?: string): Promise<ApiResponse<Admin[]>> {

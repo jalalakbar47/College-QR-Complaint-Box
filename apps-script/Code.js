@@ -198,6 +198,17 @@ function doPost(e) {
       return createJsonResponse(ConfigService.deleteLocation(payload.location_id || payload));
     }
 
+    if (action === 'changePassword') {
+      if (!Security.validateToken(token)) {
+        return createJsonResponse({
+          success: false,
+          message: 'Unauthorized: Valid administrator session token required.',
+          errorCode: 'UNAUTHORIZED',
+        });
+      }
+      return createJsonResponse(AdminService.changePassword(payload.admin_id, payload.current_password, payload.new_password));
+    }
+
     return createJsonResponse({
       success: false,
       message: 'Unknown POST action: ' + action,

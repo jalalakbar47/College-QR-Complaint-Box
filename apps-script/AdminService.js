@@ -58,6 +58,51 @@ const AdminService = {
   },
 
   /**
+   * Change Proctor Security Passkey / Password (writes directly to Google Sheets)
+   */
+  changePassword: function (adminId, currentPassword, newPassword) {
+    if (!adminId || !currentPassword || !newPassword) {
+      return { success: false, message: 'All password fields are mandatory.', errorCode: 'INVALID_INPUT' };
+    }
+
+    const cleanCurrent = String(currentPassword).trim();
+    const cleanNew = String(newPassword).trim();
+
+    if (cleanNew.length < 6) {
+      return { success: false, message: 'New password must be at least 6 characters.', errorCode: 'WEAK_PASSWORD' };
+    }
+
+    const admins = Database.readAll(Database.SHEETS.ADMINS);
+    const admin = admins.find(function (a) {
+      return String(a.admin_id).trim() === String(adminId).trim();
+    });
+
+    if (!admin) {
+      return { success: false, message: 'Admin account not found.', errorCode: 'NOT_FOUND' };
+    }
+
+    const expectedPasskey = admin.passkey ? String(admin.passkey).trim() : 'proctor2026';
+    if (cleanCurrent !== expectedPasskey) {
+      return { success: false, message: 'Current password is incorrect. Please try again.', errorCode: 'INVALID_PASSWORD' };
+    }
+
+    const updateSuccess = Database.updateRow(Database.SHEETS.ADMINS, 'admin_id', adminId, {
+      passkey: cleanNew,
+    });
+
+    if (!updateSuccess) {
+      return { success: false, message: 'Failed to update passkey in spreadsheet.', errorCode: 'WRITE_ERROR' };
+    }
+
+    ActivityLogService.logActivity(adminId, '', 'PASSWORD_CHANGE', '***', '***', 'Proctor updated account security password.');
+
+    return {
+      success: true,
+      message: 'Password changed successfully and updated in Google Sheets.',
+    };
+  },
+
+  /**
    * Calculate real-time dashboard KPI metrics from Complaints sheet
    */
   getDashboardStats: function () {

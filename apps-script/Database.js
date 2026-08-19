@@ -245,17 +245,15 @@ const Database = {
       sComplaints.setFrozenRows(1);
     }
 
-    // 2. Admins Sheet
+    // 2. Admins Sheet (Single Chief Proctor Default Account)
     let sAdmins = ss.getSheetByName(this.SHEETS.ADMINS) || ss.insertSheet(this.SHEETS.ADMINS);
     if (sAdmins.getLastRow() === 0) {
       sAdmins.appendRow(this.ADMIN_HEADERS);
       sAdmins.getRange(1, 1, 1, this.ADMIN_HEADERS.length).setBackground('#1e293b').setFontColor('#ffffff').setFontWeight('bold');
       sAdmins.setFrozenRows(1);
 
-      // Seed Initial Admins
-      sAdmins.appendRow(['ADM-001', 'Dr. Arthur Vance', 'chiefproctor@college.edu', 'Chief Proctor', 'Active', new Date().toISOString(), '']);
-      sAdmins.appendRow(['ADM-002', 'Prof. Margaret Hayes', 'admin@college.edu', 'Admin', 'Active', new Date().toISOString(), '']);
-      sAdmins.appendRow(['ADM-003', 'Officer Rajesh Kumar', 'security.staff@college.edu', 'Staff', 'Active', new Date().toISOString(), '']);
+      // Default Single Chief Proctor Admin Credentials
+      sAdmins.appendRow(['ADM-001', 'Chief Proctor', 'chiefproctor@college.edu', 'Chief Proctor', 'Active', 'proctor2026', new Date().toISOString(), '']);
     }
 
     // 3. Categories Sheet

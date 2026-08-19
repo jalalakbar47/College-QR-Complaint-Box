@@ -13,7 +13,7 @@ export type ComplaintStatus =
 
 export type ComplaintPriority = 'Low' | 'Medium' | 'High' | 'Critical';
 
-export type AdminRole = 'Chief Proctor' | 'Admin' | 'Staff';
+export type AdminRole = 'Chief Proctor' | 'Admin';
 export type AdminStatus = 'Active' | 'Inactive';
 
 export interface Complaint {
