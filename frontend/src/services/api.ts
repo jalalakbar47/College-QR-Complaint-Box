@@ -143,23 +143,43 @@ export const apiService = {
    * Admin Authentication
    */
   async adminLogin(email: string, passkey: string): Promise<ApiResponse<{ token: string; admin: Admin }>> {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPasskey = passkey.trim();
+
+    if (!cleanEmail || !cleanPasskey) {
+      return {
+        success: false,
+        message: 'Email address and security passkey are required.',
+        errorCode: 'INVALID_INPUT',
+      };
+    }
+
     if (ENV.IS_LIVE_API_CONFIGURED) {
       return callGasApi(ENV.API_URL, {
         method: 'POST',
         action: 'adminLogin',
-        data: { email: email.trim().toLowerCase(), passkey },
+        data: { email: cleanEmail, passkey: cleanPasskey },
       });
     }
 
     await new Promise((r) => setTimeout(r, 500));
     const admins = storage.get<Admin[]>(STORAGE_KEY_ADMINS, INITIAL_ADMINS);
-    const admin = admins.find((a) => a.email.toLowerCase() === email.trim().toLowerCase() && a.status === 'Active');
+    const admin = admins.find((a) => a.email.toLowerCase() === cleanEmail && a.status === 'Active');
 
     if (!admin) {
       return {
         success: false,
-        message: 'Invalid credentials or unauthorized administrative account.',
+        message: 'Invalid email or unauthorized administrative account.',
         errorCode: 'INVALID_CREDENTIALS',
+      };
+    }
+
+    const expectedPass = admin.passkey || 'proctor2026';
+    if (cleanPasskey !== expectedPass) {
+      return {
+        success: false,
+        message: 'Incorrect security passkey / password. Access denied.',
+        errorCode: 'INVALID_PASSWORD',
       };
     }
 

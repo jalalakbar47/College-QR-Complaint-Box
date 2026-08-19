@@ -44,6 +44,7 @@ export interface Admin {
   email: string;
   role: AdminRole;
   status: AdminStatus;
+  passkey?: string;
   created_at: string;
   last_login?: string;
 }

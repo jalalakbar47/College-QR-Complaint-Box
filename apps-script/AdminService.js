@@ -9,11 +9,13 @@ const AdminService = {
    * Admin Authentication against Admins sheet
    */
   login: function (email, passkey) {
-    if (!email) {
-      return { success: false, message: 'Email address is required.', errorCode: 'INVALID_INPUT' };
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanPasskey = String(passkey || '').trim();
+
+    if (!cleanEmail || !cleanPasskey) {
+      return { success: false, message: 'Email address and security passkey are required.', errorCode: 'INVALID_INPUT' };
     }
 
-    const cleanEmail = String(email).trim().toLowerCase();
     const admins = Database.readAll(Database.SHEETS.ADMINS);
 
     const admin = admins.find(function (a) {
@@ -23,8 +25,18 @@ const AdminService = {
     if (!admin) {
       return {
         success: false,
-        message: 'Invalid credentials or inactive administrative account.',
+        message: 'Invalid email or unauthorized administrative account.',
         errorCode: 'INVALID_CREDENTIALS',
+      };
+    }
+
+    // Verify security passkey against sheet or default college passkey
+    const expectedPasskey = admin.passkey ? String(admin.passkey).trim() : 'proctor2026';
+    if (cleanPasskey !== expectedPasskey) {
+      return {
+        success: false,
+        message: 'Incorrect security passkey / password. Access denied.',
+        errorCode: 'INVALID_PASSWORD',
       };
     }
 
