@@ -16,7 +16,23 @@ const AdminService = {
       return { success: false, message: 'Email address and security passkey are required.', errorCode: 'INVALID_INPUT' };
     }
 
-    const admins = Database.readAll(Database.SHEETS.ADMINS);
+    let admins = Database.readAll(Database.SHEETS.ADMINS);
+
+    // Auto-seed default Chief Proctor if Admins sheet is empty on fresh install
+    if (admins.length === 0) {
+      const defaultAdmin = {
+        admin_id: 'ADM-001',
+        name: 'Chief Proctor',
+        email: 'chiefproctor@college.edu',
+        role: 'Chief Proctor',
+        status: 'Active',
+        passkey: 'proctor2026',
+        created_at: new Date().toISOString(),
+        last_login: '',
+      };
+      Database.appendRow(Database.SHEETS.ADMINS, Database.ADMIN_HEADERS, defaultAdmin);
+      admins = [defaultAdmin];
+    }
 
     const admin = admins.find(function (a) {
       return String(a.email).trim().toLowerCase() === cleanEmail && a.status === 'Active';
