@@ -12,7 +12,7 @@ export async function callGasApi<T = any>(
   apiUrl: string,
   options: GasRequestOptions
 ): Promise<ApiResponse<T>> {
-  const { method = 'POST', action, data = {}, token, timeoutMs = 15000 } = options;
+  const { method = 'POST', action, data = {}, token, timeoutMs = 35000 } = options;
 
   if (!apiUrl || apiUrl.trim() === '') {
     return {
