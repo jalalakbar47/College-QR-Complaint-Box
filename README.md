@@ -1,27 +1,43 @@
-# 🏛️ College QR Complaint Box — Phase 1 MVP
+# 🏛️ College QR Complaint Box — v2.0.0
 
-A digital, mobile-first, and institutional-grade **Grievance Redressal and QR Complaint Box System** designed for colleges and universities.
+A digital, mobile-first, and institutional-grade **Complaint Redressal and QR Complaint Box System** designed for modern colleges and universities.
 
-Students scan QR code placards placed across the campus to submit anonymous or identified complaints directly to the **Chief Proctor Office**. The system is backed by **Google Sheets** as the database and **Google Apps Script** as the secure serverless API layer.
+Students scan QR code placards placed across the campus to submit anonymous or identified complaints directly to the **Chief Proctor Office**. The system is backed by **Google Sheets** as the zero-maintenance database and **Google Apps Script** as the secure serverless API layer.
+
+---
+
+## 🚀 What's New in Version 2.0.0
+
+- 🔊 **Real-Time Notification Engine**: Instant auditory alerts (Web Audio API synthesizer chimes), interactive toast notifications, live unread badges, and desktop push alerts on new complaint submissions.
+- 📄 **Perfect A4 Printable QR Poster Studio**: Redesigned printable campus placards featuring exact A4 aspect ratio, high-visibility QR code matrix, 3-step student instructions, and full-bleed college headers.
+- ⚡ **Zero-Latency Cross-Tab Background Sync**: Background mutation and notification channels (`BroadcastChannel`) keep multiple open admin tabs and windows synchronized without manual refreshing.
+- 💀 **Modern Skeleton Loading Suite**: Replaced old spinner loading states with smooth shimmer skeleton placeholders across tables, cards, stat widgets, and details pages.
+- 🎨 **Redesigned Proctor Complaint Details Hub**:
+  - Interactive hero banner with one-click Ticket ID copy and lifecycle progress stepper (`Logged` ➔ `In Progress` ➔ `Resolved`).
+  - Streamlined Proctor Action & Resolution Center with 1-click presets and resolution notes.
+  - Dedicated **Danger Zone** for permanent complaint deletion with confirmation modals and compliance audit logs.
+- 🗑️ **Permanent Complaint Deletion**: Full administrative ability to permanently delete complaints from both Google Sheets and local storage, complete with audit trail tracking (`ACTION: 'DELETE_COMPLAINT'`).
+- 🏷️ **Terminology Alignment**: Unified campus terminology to "Complaint" across all public pages, administrative portals, and configuration endpoints.
 
 ---
 
 ## 🌟 Key Features
 
 ### 🎓 Student Portal
-- **Scan & Go Mobile UI**: Mobile-optimized form accessible on low-end smartphones and tablets.
-- **100% Anonymous Reporting**: Option to report issues without recording name, roll number, or phone number.
-- **Categorized Filing**: Academic, Examination, Harassment, Bullying, Infrastructure, Cleanliness, Electricity, Water, Security, Hostel, etc.
-- **Unique Reference ID**: Standardized `CQB-YYYYMMDD-XXXX` ID generated for each submission (e.g. `CQB-20260818-A7F2`).
-- **Public-Safe Grievance Tracker**: Students can track live proctor progress and official resolution notes at `/track` without exposing internal administrative remarks or staff identities.
+- **Scan & Go Mobile UI**: Mobile-optimized form accessible on smartphones, tablets, and desktops.
+- **100% Anonymous Reporting**: Option to report issues with complete privacy protection (no identity tracking).
+- **Categorized Filing**: Academic, Examination, Harassment, Bullying, Discipline, Infrastructure, Cleanliness, Electricity, Water, Security, Transport, Hostel, IT/Internet, etc.
+- **Unique Reference ID**: Standardized `CQB-YYYYMMDD-XXXX` ticket ID generated for each submission (e.g. `CQB-20260818-A7F2`).
+- **Public Complaint Tracker**: Students track live proctor progress and official resolution notes at `/track` with internal administrative remarks securely protected.
 
 ### 🛡️ Chief Proctor Panel
 - **Unified Proctor Authentication**: Streamlined single-role administrative access (`Chief Proctor`).
-- **Real-Time KPI Dashboard**: Track Total, New, Under Review, In Progress, Resolved, and Critical alert counts.
-- **In-App Password Management**: Proctors can change their password directly in Settings, with changes syncing immediately to the `Admins` Google Sheet.
-- **Complaints Repository**: Search by ticket ID or keywords, filter by Status, Priority, Category, and Campus Location.
-- **Complaint Detail & Resolution Manager**: Update status (`New` → `Under Review` → `Assigned` → `In Progress` → `Resolved` → `Closed`), assign priority (`Low`, `Medium`, `High`, `Critical`), add internal remarks, and publish public resolution notes.
-- **Campus QR Studio & Poster Generator**: Live printable flyer generator (`window.print()`) with institutional headers, 3-step scan instructions, and high-res SVG QR codes for physical campus placards.
+- **Real-Time Notification Center**: Auditory chimes, toast alerts, browser notifications, and interactive notification bell dropdown.
+- **Real-Time KPI Dashboard**: Live tracking of Total, New, In Progress, Resolved, and Critical urgent complaints.
+- **Complaints Repository**: Instant search by Ticket ID, keywords, and multi-dimensional filters (Status, Priority, Category, Campus Location).
+- **Permanent Complaint Deletion**: Professional confirmation dialogs for safe and permanent deletion of complaints with audit log tracking.
+- **Campus QR Studio**: Live printable flyer generator with high-resolution QR codes, college branding, and 3-step student instructions.
+- **In-App Password Management**: Proctors can update security passkeys with direct sync to Google Sheets.
 - **Immutable Audit Trail**: Automatic `Activity_Log` recording of all administrative actions.
 
 ---
@@ -29,7 +45,7 @@ Students scan QR code placards placed across the campus to submit anonymous or i
 ## 🏗️ Architecture & Technology Stack
 
 ```
-[ Student / Admin Device ] (React 18 + TypeScript + Vite + Tailwind CSS)
+[ Student / Admin Device ] (React 18 + TypeScript + Vite 5 + Tailwind CSS 3)
            ↓ (HTTPS JSON / REST)
 [ Google Apps Script API ] (doGet / doPost Dispatcher in V8 Runtime)
            ↓ (SpreadsheetApp Service)
@@ -51,19 +67,19 @@ College-QR-Compliant/
 │   ├── public/                   # PWA manifest, icons, favicon
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ui/               # Reusable Button, Input, Modal, Table, etc.
+│   │   │   ├── ui/               # Button, Input, Modal, Table, Skeleton, ConfirmDialog
 │   │   │   ├── layout/           # Navbar, Footer, AdminSidebar, AdminHeader
-│   │   │   ├── complaints/       # Badges, Filters, Table, DetailView
+│   │   │   ├── complaints/       # Badges, Filters, Table, Card, DetailView
 │   │   │   ├── dashboard/        # StatCard, RecentComplaints, QuickActions
-│   │   │   └── qr/               # QRDisplay, PrintableQRCard
-│   │   ├── contexts/             # AuthContext, ToastContext
+│   │   │   └── qr/               # QRDisplay, PrintableQRCard (A4 Format)
+│   │   ├── contexts/             # AuthContext, ToastContext, NotificationContext, RefreshContext
 │   │   ├── hooks/                # useComplaints, useDashboardStats, etc.
 │   │   ├── pages/
 │   │   │   ├── public/           # LandingPage, ComplaintForm, Success, Track
-│   │   │   └── admin/            # Dashboard, Complaints, Detail, Settings
+│   │   │   └── admin/            # Dashboard, Complaints, Detail, Categories, Locations, ActivityLog, Settings
 │   │   ├── services/             # Centralized apiService & gasClient
 │   │   ├── types/                # Strict TypeScript interfaces
-│   │   ├── utils/                # ID generator, validation, date formatters
+│   │   ├── utils/                # ID generator, sound synthesizer, date formatters
 │   │   ├── config/               # statusConfig, constants, env
 │   │   ├── App.tsx               # Route declarations
 │   │   └── main.tsx
@@ -73,7 +89,7 @@ College-QR-Compliant/
 │   ├── Combined_Deploy.js        # Complete 1-file deployable backend
 │   ├── Code.js                   # doGet / doPost Router
 │   ├── Database.js               # Sheet access, schemas & auto-migration
-│   ├── ComplaintService.js       # Submit, track, filter, update logic
+│   ├── ComplaintService.js       # Submit, track, filter, update, delete logic
 │   ├── AdminService.js           # Auth & password management logic
 │   ├── ActivityLogService.js     # Compliance audit trail logger
 │   ├── ConfigService.js          # Categories and locations provider
@@ -95,7 +111,8 @@ College-QR-Compliant/
 
 ### 1. Clone & Install Dependencies
 ```bash
-cd frontend
+git clone https://github.com/jalalakbar47/College-QR-Complaint-Box.git
+cd College-QR-Complaint-Box/frontend
 npm install
 ```
 
@@ -106,7 +123,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 > [!NOTE]
-> The application includes an **interactive local storage simulation mode** out of the box with realistic seed data. You can test submissions, tracking, admin authentication, status updates, and printable posters immediately without any cloud configuration!
+> The application includes an **interactive local storage simulation mode** out of the box with realistic seed data. You can test submissions, tracking, admin authentication, status updates, notifications, and printable posters immediately without any cloud configuration!
 
 ### 3. Default Chief Proctor Credentials
 - **Email**: `chiefproctor@college.edu`
@@ -141,14 +158,17 @@ Verify the build output in `frontend/dist/`.
 
 ---
 
-## 🗺️ Roadmap (Future Phases)
+## 👨‍💻 Author & Developer
 
-- **Phase 2**: Location-specific QR codes with automatic room binding, file/photo attachments, email/SMS proctor notifications, CSV/Excel grievance exports.
-- **Phase 3**: Advanced analytics, resolution time metrics, proctor performance dashboards, automated escalation rules.
-- **Phase 4**: AI complaint categorization and sentiment analysis.
-- **Phase 5**: Native mobile applications and offline sync.
+**Jalaluddin Khan** ([@jalalakbar47](https://github.com/jalalakbar47))  
+*Software Developer • BS Computer Science*  
+*Government Post Graduate College (GPGC) Khar, District Bajaur*
+
+- **GitHub**: [@jalalakbar47](https://github.com/jalalakbar47)
+- **LinkedIn**: [in/jalalakbar47](https://linkedin.com/in/jalalakbar47)
+- **Email**: [jalalakbarbjr@gmail.com](mailto:jalalakbarbjr@gmail.com)
 
 ---
 
 ## 📄 License
-MIT License. Developed for university campus grievance redressing.
+MIT License. Developed for university campus complaint redressing.

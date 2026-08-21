@@ -15,7 +15,7 @@ export interface QRDisplayProps {
 export const QRDisplay: React.FC<QRDisplayProps> = ({
   url,
   size = 200,
-  title = 'Scan to Submit Grievance',
+  title = 'Scan to Submit Complaint',
   subtitle = 'Point your smartphone camera to open complaint form',
   showActions = true,
 }) => {

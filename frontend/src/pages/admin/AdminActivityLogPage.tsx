@@ -6,13 +6,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatDateTime } from '../../utils/dateFormatter';
 import { Card } from '../../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../../components/ui/Table';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { TableSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Button } from '../../components/ui/Button';
+import { useRefresh } from '../../contexts/RefreshContext';
 
 export const AdminActivityLogPage: React.FC = () => {
   const { token } = useAuth();
+  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +27,10 @@ export const AdminActivityLogPage: React.FC = () => {
       if (res.success && res.data) {
         setLogs(res.data);
       } else {
-        setError(res.message || 'Failed to retrieve activity audit trail.');
+        setError(res.message || 'Failed to retrieve activity log records.');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to retrieve logs');
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -36,15 +38,21 @@ export const AdminActivityLogPage: React.FC = () => {
 
   useEffect(() => {
     fetchLogs();
-  }, [fetchLogs]);
+  }, [fetchLogs, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler('activity_logs', fetchLogs);
+    return unregister;
+  }, [registerRefreshHandler, fetchLogs]);
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Activity & Audit Log</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Compliance & Audit Trail</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Immutable compliance record of all administrative status changes, priority assignments, and remarks.
+            Immutable log of all proctor actions, status modifications, and ticket updates.
           </p>
         </div>
 
@@ -60,7 +68,7 @@ export const AdminActivityLogPage: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <LoadingSpinner size="lg" label="Loading administrative audit history..." />
+        <TableSkeleton rows={7} />
       ) : error ? (
         <ErrorState
           title="Error retrieving audit trail"
@@ -81,7 +89,7 @@ export const AdminActivityLogPage: React.FC = () => {
                 <TableHeaderCell>Log ID</TableHeaderCell>
                 <TableHeaderCell>Timestamp</TableHeaderCell>
                 <TableHeaderCell>Proctor / Admin</TableHeaderCell>
-                <TableHeaderCell>Grievance ID</TableHeaderCell>
+                <TableHeaderCell>Complaint ID</TableHeaderCell>
                 <TableHeaderCell>Action Type</TableHeaderCell>
                 <TableHeaderCell>Change (Old → New)</TableHeaderCell>
                 <TableHeaderCell>Remarks / Notes</TableHeaderCell>

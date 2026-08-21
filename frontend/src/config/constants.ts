@@ -13,7 +13,7 @@ export const INITIAL_CATEGORIES: Category[] = [
   { category_id: 'CAT-10', category_name: 'Security', description: 'Gate pass, guards, surveillance, theft issues', status: 'Active' },
   { category_id: 'CAT-11', category_name: 'Transport', description: 'College buses, timings, route issues, drivers', status: 'Active' },
   { category_id: 'CAT-12', category_name: 'Hostel', description: 'Mess food, hostel wardens, rooms, maintenance', status: 'Active' },
-  { category_id: 'CAT-13', category_name: 'Teacher/Staff', description: 'Faculty behavior, staff coordination, grievance', status: 'Active' },
+  { category_id: 'CAT-13', category_name: 'Teacher/Staff', description: 'Faculty behavior, staff coordination, complaints', status: 'Active' },
   { category_id: 'CAT-14', category_name: 'IT/Internet', description: 'Wi-Fi connectivity, lab computers, portal access', status: 'Active' },
   { category_id: 'CAT-15', category_name: 'Other', description: 'General or miscellaneous campus issues', status: 'Active' },
 ];

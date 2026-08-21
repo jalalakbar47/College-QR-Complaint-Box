@@ -56,7 +56,7 @@ export const SubmissionSuccessPage: React.FC = () => {
             Complaint Submitted Successfully!
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-sm mx-auto">
-            Your grievance has been securely logged and forwarded to the Chief Proctor Office for evaluation.
+            Your complaint has been securely logged and forwarded to the Chief Proctor Office for evaluation.
           </p>
         </div>
 

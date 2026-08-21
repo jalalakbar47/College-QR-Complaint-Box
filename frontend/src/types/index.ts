@@ -138,3 +138,23 @@ export interface AuthSession {
   admin: Admin;
   expiresAt: number;
 }
+
+export interface AdminNotification {
+  id: string;
+  complaint_id: string;
+  title: string;
+  category: string;
+  priority: ComplaintPriority;
+  location: string;
+  submitted_at: string;
+  is_anonymous: boolean;
+  student_name?: string;
+  timestamp: number;
+  is_read: boolean;
+}
+
+export interface NotificationPreferences {
+  soundEnabled: boolean;
+  desktopEnabled: boolean;
+}
+

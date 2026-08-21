@@ -42,7 +42,7 @@ export const ComplaintFilter: React.FC<ComplaintFilterProps> = ({
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2 text-slate-800 font-bold text-sm sm:text-base">
           <Filter className="w-4 h-4 text-brand-600" />
-          <span>Filter & Search Grievances</span>
+          <span>Filter & Search Complaints</span>
         </div>
         {isFiltered && (
           <Button

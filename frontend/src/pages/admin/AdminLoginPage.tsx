@@ -75,7 +75,7 @@ export const AdminLoginPage: React.FC = () => {
           Chief Proctor Panel
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-2">
-          Authorized administrative access to campus grievance records
+          Authorized administrative access to campus complaint records
         </p>
       </div>
 

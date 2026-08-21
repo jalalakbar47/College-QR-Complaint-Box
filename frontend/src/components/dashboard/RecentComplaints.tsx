@@ -17,7 +17,7 @@ export const RecentComplaints: React.FC<RecentComplaintsProps> = ({
   return (
     <Card>
       <CardHeader
-        title="Recent Grievance Submissions"
+        title="Recent Complaint Submissions"
         subtitle="Latest 10 logged issues across academic, hostel, and campus infrastructure."
         action={
           <Link

@@ -21,7 +21,7 @@ import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { CardListSkeleton } from '../../components/ui/Skeleton';
 
 export const AdminCategoriesPage: React.FC = () => {
   const { token } = useAuth();
@@ -34,11 +34,11 @@ export const AdminCategoriesPage: React.FC = () => {
   const [isAddingCategory, setIsAddingCategory] = useState<boolean>(false);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
 
-  // Form state
-  const [formName, setFormName] = useState<string>('');
-  const [formDesc, setFormDesc] = useState<string>('');
+  // Form states
+  const [formName, setFormName] = useState('');
+  const [formDesc, setFormDesc] = useState('');
   const [formStatus, setFormStatus] = useState<'Active' | 'Inactive'>('Active');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const openAddModal = () => {
     setFormName('');
@@ -63,21 +63,8 @@ export const AdminCategoriesPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      if (isAddingCategory) {
-        const newCat: Category = {
-          category_id: `CAT-${Date.now().toString().slice(-4)}`,
-          category_name: formName.trim(),
-          description: formDesc.trim(),
-          status: formStatus,
-        };
-        const res = await apiService.saveCategory(newCat, true, token || undefined);
-        if (res.success) {
-          success(`Category "${newCat.category_name}" added successfully.`);
-          setIsAddingCategory(false);
-        } else {
-          error(res.message || 'Failed to add category.');
-        }
-      } else if (editingCategory) {
+      if (editingCategory) {
+        // Update
         const updatedCat: Category = {
           ...editingCategory,
           category_name: formName.trim(),
@@ -86,15 +73,31 @@ export const AdminCategoriesPage: React.FC = () => {
         };
         const res = await apiService.saveCategory(updatedCat, false, token || undefined);
         if (res.success) {
-          success(`Category "${updatedCat.category_name}" updated successfully.`);
+          success(`Category "${formName}" updated successfully.`);
           setEditingCategory(null);
+          refetch();
         } else {
           error(res.message || 'Failed to update category.');
         }
+      } else {
+        // Create
+        const newCat: Category = {
+          category_id: `CAT-${Date.now().toString().slice(-4)}`,
+          category_name: formName.trim(),
+          description: formDesc.trim(),
+          status: formStatus,
+        };
+        const res = await apiService.saveCategory(newCat, true, token || undefined);
+        if (res.success) {
+          success(`Category "${formName}" created successfully.`);
+          setIsAddingCategory(false);
+          refetch();
+        } else {
+          error(res.message || 'Failed to create category.');
+        }
       }
-      refetch();
     } catch {
-      error('Failed to save category.');
+      error('An error occurred while saving category.');
     } finally {
       setIsSubmitting(false);
     }
@@ -102,17 +105,20 @@ export const AdminCategoriesPage: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deletingCategoryId) return;
+    setIsSubmitting(true);
     try {
       const res = await apiService.deleteCategory(deletingCategoryId, token || undefined);
       if (res.success) {
         success('Category removed successfully.');
+        setDeletingCategoryId(null);
+        refetch();
       } else {
         error(res.message || 'Failed to delete category.');
       }
-      setDeletingCategoryId(null);
-      refetch();
     } catch {
-      error('Failed to delete category.');
+      error('An error occurred while deleting category.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -140,7 +146,7 @@ export const AdminCategoriesPage: React.FC = () => {
 
       {/* Grid of Categories */}
       {isLoading ? (
-        <LoadingSpinner size="lg" label="Loading category directory..." />
+        <CardListSkeleton count={6} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((cat) => (
@@ -164,7 +170,7 @@ export const AdminCategoriesPage: React.FC = () => {
                 </h4>
 
                 <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                  {cat.description || 'General grievance category for campus operations.'}
+                  {cat.description || 'General complaint category for campus operations.'}
                 </p>
               </div>
 

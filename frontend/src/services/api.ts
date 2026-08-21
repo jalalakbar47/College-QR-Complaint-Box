@@ -45,17 +45,70 @@ function saveLocalActivityLogs(data: ActivityLog[]): void {
   storage.set(STORAGE_KEY_LOGS, data);
 }
 
+function broadcastNewComplaint(complaint: any): void {
+  try {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      const bc = new BroadcastChannel('cqb_notifications_channel');
+      bc.postMessage({ action: 'NEW_COMPLAINT', payload: complaint });
+      bc.close();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cqb_complaint_logged', { detail: complaint }));
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('cqb_last_submitted_ping', JSON.stringify({ id: complaint.complaint_id, time: Date.now() }));
+    }
+  } catch (err) {
+    console.warn('Complaint broadcast notice error:', err);
+  }
+}
+
+function broadcastDataChanged(mutationType: string, id?: string): void {
+  try {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      const bc = new BroadcastChannel('cqb_mutations_channel');
+      bc.postMessage({ action: 'MUTATION', mutationType, id, timestamp: Date.now() });
+      bc.close();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cqb_data_changed', { detail: { mutationType, id } }));
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('cqb_data_mutation_ping', JSON.stringify({ mutationType, id, time: Date.now() }));
+    }
+  } catch (err) {
+    console.warn('Mutation broadcast notice error:', err);
+  }
+}
+
 export const apiService = {
   /**
    * Submit a new complaint (Student)
    */
   async submitComplaint(dto: SubmitComplaintDTO): Promise<ApiResponse<{ complaint_id: string; complaint: Complaint }>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi(ENV.API_URL, {
         method: 'POST',
         action: 'submitComplaint',
         data: dto,
       });
+
+      if (res.success && res.data) {
+        broadcastNewComplaint(
+          res.data.complaint || {
+            complaint_id: res.data.complaint_id,
+            title: dto.title,
+            category: dto.category,
+            location: dto.location,
+            priority: 'Medium',
+            status: 'New',
+            submitted_at: new Date().toISOString(),
+            is_anonymous: dto.is_anonymous,
+            student_name: dto.student_name,
+          }
+        );
+      }
+      return res;
     }
 
     // Local Development / Mock Mode
@@ -83,6 +136,8 @@ export const apiService = {
 
     const currentList = getLocalComplaints();
     saveLocalComplaints([newComplaint, ...currentList]);
+
+    broadcastNewComplaint(newComplaint);
 
     return {
       success: true,
@@ -387,6 +442,7 @@ export const apiService = {
     };
 
     saveLocalActivityLogs([newLog, ...logs]);
+    broadcastDataChanged('COMPLAINT_UPDATED', dto.complaint_id);
 
     return {
       success: true,
@@ -396,13 +452,57 @@ export const apiService = {
   },
 
   /**
-   * Delete Complaint
+   * Delete Complaint (Admin Action)
    */
-  async deleteComplaint(complaintId: string): Promise<ApiResponse<boolean>> {
+  async deleteComplaint(
+    complaintId: string,
+    token?: string,
+    adminId?: string,
+    reason?: string
+  ): Promise<ApiResponse<boolean>> {
+    if (ENV.IS_LIVE_API_CONFIGURED) {
+      const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
+      const res = await callGasApi<boolean>(ENV.API_URL, {
+        method: 'POST',
+        action: 'deleteComplaint',
+        data: {
+          complaint_id: complaintId,
+          admin_id: adminId || 'ADM-001',
+          reason: reason || 'Permanently deleted by Chief Proctor.',
+        },
+        token: sessionToken,
+      });
+      if (res.success) {
+        broadcastDataChanged('COMPLAINT_DELETED', complaintId);
+      }
+      return res;
+    }
+
+    await new Promise((r) => setTimeout(r, 350));
     const list = getLocalComplaints();
+    const found = list.find((c) => c.complaint_id === complaintId);
     const filtered = list.filter((c) => c.complaint_id !== complaintId);
     saveLocalComplaints(filtered);
-    return { success: true, message: 'Complaint deleted successfully.', data: true };
+
+    // Record Activity Log
+    if (found) {
+      const logs = getLocalActivityLogs();
+      const newLog: ActivityLog = {
+        log_id: `LOG-${Date.now().toString().slice(-6)}`,
+        timestamp: new Date().toISOString(),
+        admin_id: adminId || 'ADM-001',
+        admin_name: 'Chief Proctor',
+        complaint_id: complaintId,
+        action: 'DELETE_COMPLAINT',
+        old_value: found.status,
+        new_value: 'DELETED',
+        remarks: reason || 'Complaint permanently deleted from database.',
+      };
+      saveLocalActivityLogs([newLog, ...logs]);
+    }
+
+    broadcastDataChanged('COMPLAINT_DELETED', complaintId);
+    return { success: true, message: `Complaint ${complaintId} permanently deleted.`, data: true };
   },
 
   /**
@@ -423,12 +523,14 @@ export const apiService = {
   async saveCategory(category: Category, isNew = false, token?: string): Promise<ApiResponse<Category>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
       const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi<Category>(ENV.API_URL, {
         method: 'POST',
         action: 'saveCategory',
         data: category,
         token: sessionToken,
       });
+      if (res.success) broadcastDataChanged('CATEGORY_SAVED', category.category_id);
+      return res;
     }
 
     const categories = storage.get<Category[]>(STORAGE_KEY_CATEGORIES, INITIAL_CATEGORIES);
@@ -439,6 +541,7 @@ export const apiService = {
       };
       const updated = [...categories, newCat];
       storage.set(STORAGE_KEY_CATEGORIES, updated);
+      broadcastDataChanged('CATEGORY_CREATED', newCat.category_id);
       return { success: true, message: 'Category created successfully.', data: newCat };
     } else {
       const index = categories.findIndex((c) => c.category_id === category.category_id);
@@ -446,6 +549,7 @@ export const apiService = {
         categories[index] = category;
         storage.set(STORAGE_KEY_CATEGORIES, categories);
       }
+      broadcastDataChanged('CATEGORY_UPDATED', category.category_id);
       return { success: true, message: 'Category updated successfully.', data: category };
     }
   },
@@ -453,17 +557,20 @@ export const apiService = {
   async deleteCategory(categoryId: string, token?: string): Promise<ApiResponse<boolean>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
       const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi<boolean>(ENV.API_URL, {
         method: 'POST',
         action: 'deleteCategory',
         data: { category_id: categoryId },
         token: sessionToken,
       });
+      if (res.success) broadcastDataChanged('CATEGORY_DELETED', categoryId);
+      return res;
     }
 
     const categories = storage.get<Category[]>(STORAGE_KEY_CATEGORIES, INITIAL_CATEGORIES);
     const filtered = categories.filter((c) => c.category_id !== categoryId);
     storage.set(STORAGE_KEY_CATEGORIES, filtered);
+    broadcastDataChanged('CATEGORY_DELETED', categoryId);
     return { success: true, message: 'Category removed successfully.', data: true };
   },
 
@@ -485,12 +592,14 @@ export const apiService = {
   async saveLocation(location: LocationItem, isNew = false, token?: string): Promise<ApiResponse<LocationItem>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
       const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi<LocationItem>(ENV.API_URL, {
         method: 'POST',
         action: 'saveLocation',
         data: location,
         token: sessionToken,
       });
+      if (res.success) broadcastDataChanged('LOCATION_SAVED', location.location_id);
+      return res;
     }
 
     const locations = storage.get<LocationItem[]>(STORAGE_KEY_LOCATIONS, INITIAL_LOCATIONS);
@@ -501,6 +610,7 @@ export const apiService = {
       };
       const updated = [...locations, newLoc];
       storage.set(STORAGE_KEY_LOCATIONS, updated);
+      broadcastDataChanged('LOCATION_CREATED', newLoc.location_id);
       return { success: true, message: 'Location created successfully.', data: newLoc };
     } else {
       const index = locations.findIndex((l) => l.location_id === location.location_id);
@@ -508,6 +618,7 @@ export const apiService = {
         locations[index] = location;
         storage.set(STORAGE_KEY_LOCATIONS, locations);
       }
+      broadcastDataChanged('LOCATION_UPDATED', location.location_id);
       return { success: true, message: 'Location updated successfully.', data: location };
     }
   },
@@ -515,17 +626,20 @@ export const apiService = {
   async deleteLocation(locationId: string, token?: string): Promise<ApiResponse<boolean>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
       const sessionToken = token || storage.get<{ token: string } | null>('admin_session', null)?.token;
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi<boolean>(ENV.API_URL, {
         method: 'POST',
         action: 'deleteLocation',
         data: { location_id: locationId },
         token: sessionToken,
       });
+      if (res.success) broadcastDataChanged('LOCATION_DELETED', locationId);
+      return res;
     }
 
     const locations = storage.get<LocationItem[]>(STORAGE_KEY_LOCATIONS, INITIAL_LOCATIONS);
     const filtered = locations.filter((l) => l.location_id !== locationId);
     storage.set(STORAGE_KEY_LOCATIONS, filtered);
+    broadcastDataChanged('LOCATION_DELETED', locationId);
     return { success: true, message: 'Location removed successfully.', data: true };
   },
 

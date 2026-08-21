@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Admin, Complaint, UpdateComplaintDTO } from '../../types';
 import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRefresh } from '../../contexts/RefreshContext';
 import { ComplaintDetailView } from '../../components/complaints/ComplaintDetailView';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { ComplaintDetailSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
-import { Button } from '../../components/ui/Button';
 
 export const AdminComplaintDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { token } = useAuth();
+  const { registerRefreshHandler, refreshKey } = useRefresh();
 
   const [complaint, setComplaint] = useState<Complaint | null>(null);
   const [admins, setAdmins] = useState<Admin[]>([]);
@@ -47,7 +48,12 @@ export const AdminComplaintDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler(`complaint_detail_${id}`, fetchData);
+    return unregister;
+  }, [registerRefreshHandler, fetchData, id]);
 
   const handleUpdate = async (dto: UpdateComplaintDTO): Promise<boolean> => {
     setIsUpdating(true);
@@ -65,10 +71,16 @@ export const AdminComplaintDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !complaint) {
     return (
-      <div className="py-12">
-        <LoadingSpinner size="lg" label="Loading grievance details from database..." />
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between gap-4">
+          <Link to="/admin/complaints" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Complaints</span>
+          </Link>
+        </div>
+        <ComplaintDetailSkeleton />
       </div>
     );
   }
@@ -91,28 +103,23 @@ export const AdminComplaintDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Navigation Breadcrumb */}
+      {/* Navigation Breadcrumb Bar */}
       <div className="flex items-center justify-between gap-4">
         <Link
           to="/admin/complaints"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs transition-all hover:scale-105 active:scale-95"
         >
-          <ArrowLeft className="w-4 h-4 text-slate-500" />
+          <ArrowLeft className="w-4 h-4 text-brand-600" />
           <span>Back to Complaints</span>
         </Link>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchData}
-          disabled={isLoading || isUpdating}
-          leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />}
-        >
-          Refresh Record
-        </Button>
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="hidden sm:inline font-medium">Real-time sync active</span>
+        </div>
       </div>
 
-      {/* Main Detail View */}
+      {/* Main Redesigned Detail View */}
       <ComplaintDetailView
         complaint={complaint}
         admins={admins}

@@ -8,7 +8,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { ComplaintFilter, FilterState } from '../../components/complaints/ComplaintFilter';
 import { ComplaintTable } from '../../components/complaints/ComplaintTable';
 import { Pagination } from '../../components/ui/Pagination';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { TableSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Button } from '../../components/ui/Button';
 
@@ -84,7 +84,7 @@ export const AdminComplaintsPage: React.FC = () => {
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Complaints Repository</h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            View, search, and manage all student grievances submitted to the Proctor Office.
+            View, search, and manage all student complaints submitted to the Proctor Office.
           </p>
         </div>
 
@@ -112,8 +112,8 @@ export const AdminComplaintsPage: React.FC = () => {
 
       {/* Complaints Content */}
       {isLoading ? (
-        <div className="py-12">
-          <LoadingSpinner size="lg" label="Loading complaint records from Google Sheets..." />
+        <div className="space-y-4">
+          <TableSkeleton rows={8} />
         </div>
       ) : error ? (
         <ErrorState
@@ -124,7 +124,7 @@ export const AdminComplaintsPage: React.FC = () => {
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 px-1">
-            <span>Showing {paginatedComplaints.length} of {totalItems} grievances</span>
+            <span>Showing {paginatedComplaints.length} of {totalItems} complaints</span>
           </div>
 
           <ComplaintTable complaints={paginatedComplaints} isLoading={isLoading} />

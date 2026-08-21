@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardStats } from '../types';
 import { apiService } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useRefresh } from '../contexts/RefreshContext';
 
 export function useDashboardStats() {
   const { token } = useAuth();
+  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,12 @@ export function useDashboardStats() {
 
   useEffect(() => {
     fetchStats();
-  }, [fetchStats]);
+  }, [fetchStats, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler(`stats_${Math.random()}`, fetchStats);
+    return unregister;
+  }, [registerRefreshHandler, fetchStats]);
 
   return { stats, isLoading, error, refetch: fetchStats };
 }

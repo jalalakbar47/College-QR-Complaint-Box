@@ -20,7 +20,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { CardListSkeleton } from '../../components/ui/Skeleton';
 import { PrintableQRCard } from '../../components/qr/PrintableQRCard';
 import { ENV } from '../../config/env';
 
@@ -139,7 +139,7 @@ export const AdminLocationsPage: React.FC = () => {
 
       {/* Grid of Locations */}
       {isLoading ? (
-        <LoadingSpinner size="lg" label="Loading location directory..." />
+        <CardListSkeleton count={6} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {locations.map((loc) => (

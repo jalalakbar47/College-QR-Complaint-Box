@@ -46,7 +46,7 @@ export const TrackComplaintPage: React.FC = () => {
         setSearchParams({ id: idToSearch });
       } else {
         setErrorMessage(
-          response.message || `No grievance record found with ID "${idToSearch}". Please check and try again.`
+          response.message || `No complaint record found with ID "${idToSearch}". Please check and try again.`
         );
       }
     } catch {
@@ -68,7 +68,7 @@ export const TrackComplaintPage: React.FC = () => {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold mb-3">
           <Search className="w-4 h-4 text-brand-600" />
-          <span>Public Grievance Tracker</span>
+          <span>Public Complaint Tracker</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
           Track Your Complaint Status
@@ -119,7 +119,7 @@ export const TrackComplaintPage: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 mx-auto mb-3">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-rose-900 mb-1">Grievance Not Found</h3>
+          <h3 className="text-base font-bold text-rose-900 mb-1">Complaint Not Found</h3>
           <p className="text-xs sm:text-sm text-rose-700 max-w-md mx-auto">{errorMessage}</p>
         </div>
       )}

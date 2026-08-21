@@ -133,10 +133,10 @@ export const ComplaintFormPage: React.FC = () => {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold mb-3">
           <ShieldCheck className="w-4 h-4 text-brand-600" />
-          <span>Student Redressal System</span>
+          <span>Student Complaint Portal</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Submit Campus Grievance
+          Submit Campus Complaint
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-md mx-auto">
           Please fill out the form below with specific details. Your issue will be routed directly to the Chief Proctor.
@@ -150,7 +150,7 @@ export const ComplaintFormPage: React.FC = () => {
             title={
               <div className="flex items-center gap-2 text-slate-900">
                 <FolderTree className="w-5 h-5 text-brand-600" />
-                <span>1. Grievance Classification</span>
+                <span>1. Complaint Classification</span>
               </div>
             }
             subtitle="Categorize the type and location of the issue"
@@ -216,7 +216,7 @@ export const ComplaintFormPage: React.FC = () => {
             title={
               <div className="flex items-center gap-2 text-slate-900">
                 <FileText className="w-5 h-5 text-brand-600" />
-                <span>2. Grievance Description</span>
+                <span>2. Complaint Description</span>
               </div>
             }
             subtitle="Provide a concise title and detailed explanation"
@@ -365,7 +365,7 @@ export const ComplaintFormPage: React.FC = () => {
             disabled={isSubmitting}
             leftIcon={<Send className="w-5 h-5" />}
           >
-            {isSubmitting ? 'Recording Grievance...' : 'Submit Complaint to Proctor'}
+            {isSubmitting ? 'Recording Complaint...' : 'Submit Complaint to Proctor'}
           </Button>
 
           <p className="text-center text-xs text-slate-400 mt-3">

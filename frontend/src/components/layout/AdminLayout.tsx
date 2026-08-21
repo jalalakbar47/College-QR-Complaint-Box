@@ -27,7 +27,7 @@ export const AdminLayout: React.FC = () => {
     if (path.includes('/admin/dashboard')) return 'Proctor & Admin Overview';
     if (path.includes('/admin/complaints/')) return 'Complaint Details & Action';
     if (path.includes('/admin/complaints')) return 'Complaint Records Repository';
-    if (path.includes('/admin/categories')) return 'Grievance Categories';
+    if (path.includes('/admin/categories')) return 'Complaint Categories';
     if (path.includes('/admin/locations')) return 'Campus Locations Directory';
     if (path.includes('/admin/activity-log')) return 'Compliance & Audit Trail';
     if (path.includes('/admin/settings')) return 'Campus QR Studio & Settings';

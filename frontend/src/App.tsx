@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Layouts
 import { StudentLayout } from './components/layout/StudentLayout';
@@ -24,40 +25,47 @@ import { AdminLocationsPage } from './pages/admin/AdminLocationsPage';
 import { AdminActivityLogPage } from './pages/admin/AdminActivityLogPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 
+import { RefreshProvider } from './contexts/RefreshContext';
+
 export const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
         <ToastProvider>
-          <Routes>
-            {/* Student / Public Routes */}
-            <Route element={<StudentLayout />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/complaint" element={<ComplaintFormPage />} />
-              <Route path="/complaint/success" element={<SubmissionSuccessPage />} />
-              <Route path="/track" element={<TrackComplaintPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
+          <RefreshProvider>
+            <NotificationProvider>
+              <Routes>
+                {/* Student / Public Routes */}
+                <Route element={<StudentLayout />}>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/complaint" element={<ComplaintFormPage />} />
+                  <Route path="/complaint/success" element={<SubmissionSuccessPage />} />
+                  <Route path="/track" element={<TrackComplaintPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Route>
 
-            {/* Admin Authentication */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+                {/* Admin Authentication */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
-            {/* Protected Admin ERP Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="complaints" element={<AdminComplaintsPage />} />
-              <Route path="complaints/:id" element={<AdminComplaintDetailPage />} />
-              <Route path="categories" element={<AdminCategoriesPage />} />
-              <Route path="locations" element={<AdminLocationsPage />} />
-              <Route path="activity-log" element={<AdminActivityLogPage />} />
-              <Route path="settings" element={<AdminSettingsPage />} />
-            </Route>
-          </Routes>
+                {/* Protected Admin ERP Routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboardPage />} />
+                  <Route path="complaints" element={<AdminComplaintsPage />} />
+                  <Route path="complaints/:id" element={<AdminComplaintDetailPage />} />
+                  <Route path="categories" element={<AdminCategoriesPage />} />
+                  <Route path="locations" element={<AdminLocationsPage />} />
+                  <Route path="activity-log" element={<AdminActivityLogPage />} />
+                  <Route path="settings" element={<AdminSettingsPage />} />
+                </Route>
+              </Routes>
+            </NotificationProvider>
+          </RefreshProvider>
         </ToastProvider>
       </AuthProvider>
     </Router>
   );
 };
+
 
 export default App;

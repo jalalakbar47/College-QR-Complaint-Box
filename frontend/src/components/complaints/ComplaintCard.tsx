@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Calendar, User, Eye, AlertCircle } from 'lucide-react';
+import { MapPin, Calendar, User, Eye, AlertCircle, Trash2 } from 'lucide-react';
 import { Complaint } from '../../types';
 import { ComplaintStatusBadge } from './ComplaintStatusBadge';
 import { PriorityBadge } from './PriorityBadge';
@@ -9,9 +9,10 @@ import { formatDateTime } from '../../utils/dateFormatter';
 export interface ComplaintCardProps {
   complaint: Complaint;
   isAdmin?: boolean;
+  onDelete?: (complaintId: string) => void;
 }
 
-export const ComplaintCard: React.FC<ComplaintCardProps> = ({ complaint, isAdmin = false }) => {
+export const ComplaintCard: React.FC<ComplaintCardProps> = ({ complaint, isAdmin = false, onDelete }) => {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-subtle hover:shadow-card transition-all flex flex-col justify-between gap-3.5">
       <div>
@@ -56,22 +57,33 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({ complaint, isAdmin
         </div>
 
         {isAdmin ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {complaint.is_anonymous ? (
               <span className="text-[11px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Anonymous</span>
             ) : (
-              <div className="flex items-center gap-1 text-[11px] text-slate-600 font-medium truncate max-w-[110px]">
+              <div className="flex items-center gap-1 text-[11px] text-slate-600 font-medium truncate max-w-[90px]">
                 <User className="w-3 h-3 text-slate-400" />
                 <span className="truncate">{complaint.student_name}</span>
               </div>
             )}
             <Link
               to={`/admin/complaints/${complaint.complaint_id}`}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors"
+              title="View Details"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>View</span>
             </Link>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(complaint.complaint_id)}
+                className="p-1 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                title="Delete Complaint"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         ) : (
           complaint.resolution && (

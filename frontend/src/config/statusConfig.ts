@@ -27,7 +27,7 @@ export const STATUS_CONFIG: Record<ComplaintStatus, StatusStyle> = {
     borderClass: 'border-amber-300',
     bgClass: 'bg-amber-50',
     textClass: 'text-amber-700',
-    description: 'Proctor office is currently evaluating the grievance.',
+    description: 'Proctor office is currently evaluating the complaint.',
   },
   Assigned: {
     label: 'Assigned',
@@ -72,7 +72,7 @@ export const STATUS_CONFIG: Record<ComplaintStatus, StatusStyle> = {
     borderClass: 'border-slate-300',
     bgClass: 'bg-slate-50',
     textClass: 'text-slate-700',
-    description: 'Grievance ticket has reached its end of cycle.',
+    description: 'Complaint ticket has reached its end of cycle.',
   },
 };
 

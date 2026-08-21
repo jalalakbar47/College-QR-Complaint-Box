@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Complaint } from '../types';
 import { apiService } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useRefresh } from '../contexts/RefreshContext';
 
 export interface UseComplaintsOptions {
   search?: string;
@@ -15,6 +16,7 @@ export interface UseComplaintsOptions {
 
 export function useComplaints(options: UseComplaintsOptions = {}) {
   const { token } = useAuth();
+  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,12 @@ export function useComplaints(options: UseComplaintsOptions = {}) {
     if (options.autoFetch !== false) {
       fetchComplaints();
     }
-  }, [fetchComplaints, options.autoFetch]);
+  }, [fetchComplaints, options.autoFetch, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler(`complaints_${Math.random()}`, fetchComplaints);
+    return unregister;
+  }, [registerRefreshHandler, fetchComplaints]);
 
   return {
     complaints,

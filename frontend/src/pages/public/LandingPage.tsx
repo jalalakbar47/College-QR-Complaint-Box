@@ -26,7 +26,7 @@ export const LandingPage: React.FC = () => {
           {/* Institutional Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/80 border border-brand-700/60 text-brand-200 text-xs font-semibold tracking-wide shadow-sm backdrop-blur-xs animate-fade-in">
             <ShieldCheck className="w-4 h-4 text-brand-400" />
-            <span>Official Student Grievance & Redressal Portal</span>
+            <span>Official Student Complaint & Redressal Portal</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
@@ -34,7 +34,7 @@ export const LandingPage: React.FC = () => {
           </h1>
 
           <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Fast, confidential, and accountable campus issue reporting. Submit academic, infrastructure, or safety grievances directly to the Chief Proctor.
+            Fast, confidential, and accountable campus issue reporting. Submit academic, infrastructure, or safety complaints directly to the Chief Proctor.
           </p>
 
           {/* Action CTAs */}
@@ -46,7 +46,7 @@ export const LandingPage: React.FC = () => {
                 className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 shadow-elevated text-white text-base font-bold py-4 px-8"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
-                Submit a Grievance
+                Submit a Complaint
               </Button>
             </Link>
 
@@ -93,7 +93,7 @@ export const LandingPage: React.FC = () => {
                 How the QR Complaint Box Works
               </h2>
               <p className="text-sm text-slate-600 mt-2">
-                Designed to make student grievance filing frictionless, safe, and quickly actionable by campus administration.
+                Designed to make student complaint filing frictionless, safe, and quickly actionable by campus administration.
               </p>
             </div>
 

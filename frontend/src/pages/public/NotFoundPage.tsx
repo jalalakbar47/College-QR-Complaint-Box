@@ -12,7 +12,7 @@ export const NotFoundPage: React.FC = () => {
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Page Not Found</h1>
         <p className="text-sm text-slate-500">
-          The page or grievance link you are looking for does not exist or has been moved.
+          The page or complaint link you are looking for does not exist or has been moved.
         </p>
         <div className="pt-2 flex items-center justify-center gap-3">
           <Link to="/">
@@ -22,7 +22,7 @@ export const NotFoundPage: React.FC = () => {
           </Link>
           <Link to="/complaint">
             <Button variant="outline" size="md">
-              Submit Grievance
+              Submit Complaint
             </Button>
           </Link>
         </div>

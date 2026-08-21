@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Inbox, MapPin } from 'lucide-react';
+import { Eye, Inbox, MapPin, Trash2 } from 'lucide-react';
 import { Complaint } from '../../types';
 import { ComplaintStatusBadge } from './ComplaintStatusBadge';
 import { PriorityBadge } from './PriorityBadge';
@@ -8,21 +8,57 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { ComplaintCard } from './ComplaintCard';
 import { formatDate } from '../../utils/dateFormatter';
 import { EmptyState } from '../ui/EmptyState';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { apiService } from '../../services/api';
+import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export interface ComplaintTableProps {
   complaints: Complaint[];
   isLoading?: boolean;
+  onDeleted?: () => void;
 }
 
 export const ComplaintTable: React.FC<ComplaintTableProps> = ({
   complaints,
   isLoading = false,
+  onDeleted,
 }) => {
+  const { admin } = useAuth();
+  const { success, error } = useToast();
+
+  const [deletingComplaint, setDeletingComplaint] = useState<Complaint | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  const handleDelete = async () => {
+    if (!deletingComplaint) return;
+    setIsDeleting(true);
+    try {
+      const res = await apiService.deleteComplaint(
+        deletingComplaint.complaint_id,
+        undefined,
+        admin?.admin_id,
+        'Permanently deleted by Chief Proctor from Complaint Table'
+      );
+      if (res.success) {
+        success(`Complaint ${deletingComplaint.complaint_id} permanently deleted.`);
+        setDeletingComplaint(null);
+        if (onDeleted) onDeleted();
+      } else {
+        error(res.message || 'Failed to delete complaint.');
+      }
+    } catch {
+      error('An error occurred while deleting the complaint.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (complaints.length === 0 && !isLoading) {
     return (
       <EmptyState
         icon={<Inbox className="w-8 h-8 text-slate-400" />}
-        title="No Grievances Found"
+        title="No Complaints Found"
         description="No complaint records match your current filter and search criteria."
       />
     );
@@ -33,21 +69,26 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
       {/* Mobile Card Layout (< 768px) */}
       <div className="grid grid-cols-1 gap-3.5 md:hidden">
         {complaints.map((c) => (
-          <ComplaintCard key={c.complaint_id} complaint={c} isAdmin={true} />
+          <ComplaintCard
+            key={c.complaint_id}
+            complaint={c}
+            isAdmin={true}
+            onDelete={() => setDeletingComplaint(c)}
+          />
         ))}
       </div>
 
-      {/* Desktop Table View (>= 768px) - Optimized to fit 100% width with ZERO horizontal scroll */}
+      {/* Desktop Table View (>= 768px) */}
       <div className="hidden md:block w-full">
         <Table className="table-auto w-full">
           <TableHead>
             <TableRow>
               <TableHeaderCell className="w-36">ID & Date</TableHeaderCell>
               <TableHeaderCell className="w-44">Category / Location</TableHeaderCell>
-              <TableHeaderCell>Grievance Details</TableHeaderCell>
+              <TableHeaderCell>Complaint Details</TableHeaderCell>
               <TableHeaderCell className="w-32">Student</TableHeaderCell>
               <TableHeaderCell className="w-28">Status</TableHeaderCell>
-              <TableHeaderCell className="w-20 text-right">Action</TableHeaderCell>
+              <TableHeaderCell className="w-24 text-right">Actions</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,7 +117,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                   </div>
                 </TableCell>
 
-                {/* Grievance Title + Priority Badge */}
+                {/* Complaint Title + Priority Badge */}
                 <TableCell>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
@@ -112,21 +153,45 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                   <ComplaintStatusBadge status={c.status} />
                 </TableCell>
 
-                {/* Action View Button */}
+                {/* Action Buttons: View & Delete */}
                 <TableCell className="text-right">
-                  <Link
-                    to={`/admin/complaints/${c.complaint_id}`}
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>View</span>
-                  </Link>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <Link
+                      to={`/admin/complaints/${c.complaint_id}`}
+                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition-colors"
+                      title="View Complaint Details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => setDeletingComplaint(c)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all"
+                      title="Delete Complaint"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={Boolean(deletingComplaint)}
+        onClose={() => setDeletingComplaint(null)}
+        onConfirm={handleDelete}
+        title="Permanently Delete Complaint?"
+        message={`Are you sure you want to permanently delete complaint ${deletingComplaint?.complaint_id} ("${deletingComplaint?.title}")? This will erase the record from the database.`}
+        confirmText="Delete Complaint"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </>
   );
 };

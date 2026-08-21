@@ -157,6 +157,17 @@ function doPost(e) {
       return createJsonResponse(ComplaintService.updateComplaint(payload));
     }
 
+    if (action === 'deleteComplaint') {
+      if (!Security.validateToken(token)) {
+        return createJsonResponse({
+          success: false,
+          message: 'Unauthorized: Valid administrator session token required.',
+          errorCode: 'UNAUTHORIZED',
+        });
+      }
+      return createJsonResponse(ComplaintService.deleteComplaint(payload.complaint_id || payload, payload.admin_id, payload.reason));
+    }
+
     if (action === 'saveCategory') {
       if (!Security.validateToken(token)) {
         return createJsonResponse({

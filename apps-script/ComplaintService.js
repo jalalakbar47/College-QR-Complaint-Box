@@ -275,4 +275,45 @@ const ComplaintService = {
       data: Object.assign({}, current, updatedFields),
     };
   },
+
+  /**
+   * Delete complaint permanently (Admin only)
+   */
+  deleteComplaint: function (complaintId, adminId, reason) {
+    if (!complaintId) {
+      return { success: false, message: 'Complaint ID is required.', errorCode: 'INVALID_ID' };
+    }
+
+    const cleanId = String(complaintId).trim().toUpperCase();
+    const complaints = Database.readAll(Database.SHEETS.COMPLAINTS);
+    const found = complaints.find(function (c) {
+      return String(c.complaint_id).trim().toUpperCase() === cleanId;
+    });
+
+    if (!found) {
+      return { success: false, message: 'Complaint record not found.', errorCode: 'NOT_FOUND' };
+    }
+
+    const deleteSuccess = Database.deleteRow(Database.SHEETS.COMPLAINTS, 'complaint_id', cleanId);
+
+    if (!deleteSuccess) {
+      return { success: false, message: 'Failed to delete row from spreadsheet.', errorCode: 'DELETE_ERROR' };
+    }
+
+    // Write Activity Log
+    ActivityLogService.logActivity(
+      adminId || 'ADM-001',
+      cleanId,
+      'DELETE_COMPLAINT',
+      found.status,
+      'DELETED',
+      reason || 'Chief Proctor permanently deleted complaint ticket.'
+    );
+
+    return {
+      success: true,
+      message: 'Complaint ' + cleanId + ' permanently deleted from database.',
+      data: true,
+    };
+  },
 };

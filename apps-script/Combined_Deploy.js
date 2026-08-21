@@ -654,6 +654,43 @@ const ComplaintService = {
       data: Object.assign({}, current, updatedFields),
     };
   },
+
+  deleteComplaint: function (complaintId, adminId, reason) {
+    if (!complaintId) {
+      return { success: false, message: 'Complaint ID is required.', errorCode: 'INVALID_ID' };
+    }
+
+    const cleanId = String(complaintId).trim().toUpperCase();
+    const complaints = Database.readAll(Database.SHEETS.COMPLAINTS);
+    const found = complaints.find(function (c) {
+      return String(c.complaint_id).trim().toUpperCase() === cleanId;
+    });
+
+    if (!found) {
+      return { success: false, message: 'Complaint record not found.', errorCode: 'NOT_FOUND' };
+    }
+
+    const deleteSuccess = Database.deleteRow(Database.SHEETS.COMPLAINTS, 'complaint_id', cleanId);
+
+    if (!deleteSuccess) {
+      return { success: false, message: 'Failed to delete row from spreadsheet.', errorCode: 'DELETE_ERROR' };
+    }
+
+    ActivityLogService.logActivity(
+      adminId || 'ADM-001',
+      cleanId,
+      'DELETE_COMPLAINT',
+      found.status,
+      'DELETED',
+      reason || 'Chief Proctor permanently deleted complaint ticket.'
+    );
+
+    return {
+      success: true,
+      message: 'Complaint ' + cleanId + ' permanently deleted from database.',
+      data: true,
+    };
+  },
 };
 
 // ==========================================
@@ -922,6 +959,14 @@ function doPost(e) {
       return createJsonResponse(ComplaintService.updateComplaint(payload));
     }
 
+    // Protected Admin POST: Delete Complaint
+    if (action === 'deleteComplaint') {
+      if (!Security.validateToken(token)) {
+        return createJsonResponse({ success: false, message: 'Unauthorized: Valid administrator session token required.', errorCode: 'UNAUTHORIZED' });
+      }
+      return createJsonResponse(ComplaintService.deleteComplaint(payload.complaint_id || payload, payload.admin_id, payload.reason));
+    }
+
     // Protected Admin POST: Categories CRUD
     if (action === 'saveCategory') {
       if (!Security.validateToken(token)) {
@@ -965,7 +1010,7 @@ function doPost(e) {
       message: 'Unknown POST action: ' + action,
       errorCode: 'UNKNOWN_ACTION',
       receivedAction: action,
-      availableActions: ['submitComplaint', 'adminLogin', 'updateComplaint', 'saveCategory', 'deleteCategory', 'saveLocation', 'deleteLocation', 'changePassword']
+      availableActions: ['submitComplaint', 'adminLogin', 'updateComplaint', 'deleteComplaint', 'saveCategory', 'deleteCategory', 'saveLocation', 'deleteLocation', 'changePassword']
     });
   } catch (error) {
     return createJsonResponse({

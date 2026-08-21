@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { LocationItem } from '../types';
 import { apiService } from '../services/api';
 import { INITIAL_LOCATIONS } from '../config/constants';
+import { useRefresh } from '../contexts/RefreshContext';
 
 export function useLocations() {
+  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [locations, setLocations] = useState<LocationItem[]>(INITIAL_LOCATIONS);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,12 @@ export function useLocations() {
 
   useEffect(() => {
     fetchLocations();
-  }, [fetchLocations]);
+  }, [fetchLocations, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler(`locations_${Math.random()}`, fetchLocations);
+    return unregister;
+  }, [registerRefreshHandler, fetchLocations]);
 
   return { locations, isLoading, error, refetch: fetchLocations };
 }

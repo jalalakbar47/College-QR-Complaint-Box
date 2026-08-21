@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import {
   QrCode,
-  RotateCcw,
-  CheckCircle2,
   Server,
-  Database,
   ShieldCheck,
   KeyRound,
   Eye,
   EyeOff,
   Mail,
   Lock,
+  Bell,
+  Volume2,
+  VolumeX,
+  BellRing,
 } from 'lucide-react';
 import { PrintableQRCard } from '../../components/qr/PrintableQRCard';
 import { Card, CardHeader } from '../../components/ui/Card';
@@ -21,12 +22,19 @@ import { useLocations } from '../../hooks/useLocations';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 import { ENV } from '../../config/env';
 
 export const AdminSettingsPage: React.FC = () => {
   const { locations } = useLocations();
   const { admin, token } = useAuth();
   const { success, error: toastError } = useToast();
+  const {
+    soundEnabled,
+    setSoundEnabled,
+    desktopPermission,
+    requestDesktopPermission,
+  } = useNotifications();
 
   const [selectedLocation, setSelectedLocation] = useState<string>('General Campus');
   const [customLocation, setCustomLocation] = useState<string>('');
@@ -40,6 +48,7 @@ export const AdminSettingsPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
   const [passwordFeedback, setPasswordFeedback] = useState<{ text: string; isError: boolean } | null>(null);
+
 
   const activeLocation = customLocation.trim() || selectedLocation;
 
@@ -105,17 +114,9 @@ export const AdminSettingsPage: React.FC = () => {
     }
   };
 
-  const handleResetDb = () => {
-    if (window.confirm('Are you sure you want to reset local simulation data to factory defaults?')) {
-      apiService.resetLocalDatabase();
-      success('Local simulation database reset to initial seed data.');
-      setTimeout(() => window.location.reload(), 800);
-    }
-  };
-
   return (
     <div className="space-y-8">
-      <div>
+      <div className="no-print">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Chief Proctor Settings & QR Studio</h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
           Manage your official administrative profile, update credentials, and generate campus flyers.
@@ -126,7 +127,7 @@ export const AdminSettingsPage: React.FC = () => {
         {/* Left Column: Proctor Profile & Password Management + QR Studio */}
         <div className="lg:col-span-8 space-y-6">
           {/* Chief Proctor Profile & Password Management Card */}
-          <Card className="border-slate-200">
+          <Card className="border-slate-200 no-print">
             <CardHeader
               title={
                 <div className="flex items-center gap-2">
@@ -265,45 +266,47 @@ export const AdminSettingsPage: React.FC = () => {
           </Card>
 
           {/* Campus Poster Customizer */}
-          <Card>
-            <CardHeader
-              title={
-                <div className="flex items-center gap-2">
-                  <QrCode className="w-5 h-5 text-brand-600" />
-                  <span>Campus Poster Customizer</span>
-                </div>
-              }
-              subtitle="Select or type a location to generate location-tagged QR codes."
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <Select
-                label="Standard Location"
-                value={selectedLocation}
-                onChange={(e) => {
-                  setSelectedLocation(e.target.value);
-                  setCustomLocation('');
-                }}
-                options={[
-                  { value: 'General Campus', label: 'General Campus (All Zones)' },
-                  ...locations.map((l) => ({
-                    value: l.location_name,
-                    label: l.location_name,
-                  })),
-                ]}
+          <Card className="print:border-0 print:shadow-none print:p-0">
+            <div className="no-print">
+              <CardHeader
+                title={
+                  <div className="flex items-center gap-2">
+                    <QrCode className="w-5 h-5 text-brand-600" />
+                    <span>Campus Poster Customizer</span>
+                  </div>
+                }
+                subtitle="Select or type a location to generate location-tagged QR codes."
               />
 
-              <Input
-                label="Or Custom Location Title"
-                placeholder="e.g. Mechanical Workshop Block 4"
-                value={customLocation}
-                onChange={(e) => setCustomLocation(e.target.value)}
-                helperText="Encodes location parameter automatically into the QR URL"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <Select
+                  label="Standard Location"
+                  value={selectedLocation}
+                  onChange={(e) => {
+                    setSelectedLocation(e.target.value);
+                    setCustomLocation('');
+                  }}
+                  options={[
+                    { value: 'General Campus', label: 'General Campus (All Zones)' },
+                    ...locations.map((l) => ({
+                      value: l.location_name,
+                      label: l.location_name,
+                    })),
+                  ]}
+                />
+
+                <Input
+                  label="Or Custom Location Title"
+                  placeholder="e.g. Mechanical Workshop Block 4"
+                  value={customLocation}
+                  onChange={(e) => setCustomLocation(e.target.value)}
+                  helperText="Encodes location parameter automatically into the QR URL"
+                />
+              </div>
             </div>
 
             {/* Poster Preview */}
-            <div className="p-4 sm:p-6 rounded-2xl bg-slate-100 border border-slate-200">
+            <div className="p-4 sm:p-6 rounded-2xl bg-slate-100 border border-slate-200 print:bg-transparent print:border-0 print:p-0">
               <PrintableQRCard
                 locationName={activeLocation}
                 complaintUrl={complaintUrl}
@@ -312,81 +315,114 @@ export const AdminSettingsPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Right Column: System & Environment Status */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Backend Connection Card */}
+        {/* Right Column: Notification Preferences & System Status */}
+        <div className="lg:col-span-4 space-y-6 no-print">
+          {/* Real-time Notification Engine Preferences */}
+          <Card>
+            <CardHeader
+              title={
+                <div className="flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-brand-600" />
+                  <span>Alert & Notification Settings</span>
+                </div>
+              }
+              subtitle="Configure audio and browser alerts when complaints are logged."
+            />
+
+            <div className="space-y-4 text-xs">
+              {/* Sound Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  {soundEnabled ? (
+                    <Volume2 className="w-4 h-4 text-emerald-600" />
+                  ) : (
+                    <VolumeX className="w-4 h-4 text-slate-400" />
+                  )}
+                  <div>
+                    <span className="font-semibold text-slate-800 block">Audio Chimes</span>
+                    <span className="text-[10px] text-slate-400">Play tone when new ticket arrives</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    soundEnabled ? 'bg-brand-600' : 'bg-slate-300'
+                  }`}
+                  role="switch"
+                  aria-checked={soundEnabled}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                      soundEnabled ? 'translate-x-4' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Desktop Push Notification Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  <BellRing className={`w-4 h-4 ${desktopPermission === 'granted' ? 'text-emerald-600' : 'text-amber-500'}`} />
+                  <div>
+                    <span className="font-semibold text-slate-800 block">Desktop Push Alerts</span>
+                    <span className="text-[10px] text-slate-400">
+                      {desktopPermission === 'granted'
+                        ? 'Active & allowed in browser'
+                        : desktopPermission === 'denied'
+                        ? 'Blocked in browser settings'
+                        : 'Requires permission prompt'}
+                    </span>
+                  </div>
+                </div>
+                {desktopPermission !== 'granted' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-[10px] px-2 py-1 h-auto font-bold"
+                    onClick={requestDesktopPermission}
+                  >
+                    Enable
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* System & Database Status Card */}
           <Card>
             <CardHeader
               title={
                 <div className="flex items-center gap-2">
                   <Server className="w-5 h-5 text-brand-600" />
-                  <span>Backend Status</span>
+                  <span>System & Database Status</span>
                 </div>
               }
+              subtitle="Operational health and database synchronizer."
             />
 
-            <div className="space-y-4 text-xs">
+            <div className="space-y-3.5 text-xs">
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-slate-400 block text-[11px] font-semibold uppercase mb-1">
-                  Active Mode
+                <span className="text-slate-400 block text-[10px] font-bold uppercase tracking-wider mb-1.5">
+                  Database Engine
                 </span>
                 {ENV.IS_LIVE_API_CONFIGURED ? (
                   <div className="flex items-center gap-2 text-emerald-700 font-bold">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span>Live Google Apps Script Web App</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                    <span>Google Sheets Live Cloud Database</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-brand-700 font-bold">
-                    <Database className="w-4 h-4 text-brand-600 flex-shrink-0" />
-                    <span>Local Development Mock Mode</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-500 inline-block" />
+                    <span>Local Development Database Mode</span>
                   </div>
                 )}
-              </div>
-
-              <div>
-                <span className="text-slate-400 block text-[11px] font-semibold uppercase mb-1">
-                  Google Apps Script URL
-                </span>
-                <p className="font-mono text-[11px] text-slate-700 bg-slate-100 p-2.5 rounded-lg border border-slate-200 break-all">
-                  {ENV.API_URL || 'Not configured (VITE_API_URL is empty)'}
-                </p>
-                <p className="text-[10px] text-slate-400 mt-1">
-                  To connect to your live Google Sheets database, deploy the script in <code className="bg-slate-200 px-1 py-0.5 rounded">apps-script/</code> and paste the Web App URL into <code className="bg-slate-200 px-1 py-0.5 rounded">.env</code>.
-                </p>
-              </div>
-
-              <div>
-                <span className="text-slate-400 block text-[11px] font-semibold uppercase mb-1">
-                  Target Public Portal URL
-                </span>
-                <p className="font-mono text-[11px] text-slate-700 bg-slate-100 p-2 rounded-lg border border-slate-200 break-all">
-                  {ENV.CAMPUS_PORTAL_URL}
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Complaints, proctor logs, and categories are synchronizing automatically.
                 </p>
               </div>
             </div>
-          </Card>
-
-          {/* Database Reset Card (For dev & QA) */}
-          <Card className="border-amber-200 bg-amber-50/20">
-            <CardHeader
-              title={
-                <div className="flex items-center gap-2 text-amber-900">
-                  <RotateCcw className="w-5 h-5 text-amber-600" />
-                  <span>Developer Seed Reset</span>
-                </div>
-              }
-              subtitle="Reset local test records to initial demo complaints."
-            />
-
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-full text-xs font-semibold border-amber-300 hover:bg-amber-100/60 text-amber-900"
-              onClick={handleResetDb}
-              leftIcon={<RotateCcw className="w-3.5 h-3.5 text-amber-600" />}
-            >
-              Reset Seed Complaints & Logs
-            </Button>
           </Card>
         </div>
       </div>

@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Category } from '../types';
 import { apiService } from '../services/api';
 import { INITIAL_CATEGORIES } from '../config/constants';
+import { useRefresh } from '../contexts/RefreshContext';
 
 export function useCategories() {
+  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,12 @@ export function useCategories() {
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+  }, [fetchCategories, refreshKey]);
+
+  useEffect(() => {
+    const unregister = registerRefreshHandler(`categories_${Math.random()}`, fetchCategories);
+    return unregister;
+  }, [registerRefreshHandler, fetchCategories]);
 
   return { categories, isLoading, error, refetch: fetchCategories };
 }

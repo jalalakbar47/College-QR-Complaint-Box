@@ -11,7 +11,7 @@ import { useDashboardStats } from '../../hooks/useDashboardStats';
 import { StatCard } from '../../components/dashboard/StatCard';
 import { RecentComplaints } from '../../components/dashboard/RecentComplaints';
 import { QuickActionCard } from '../../components/dashboard/QuickActionCard';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { DashboardStatsSkeleton, TableSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENV } from '../../config/env';
@@ -23,8 +23,16 @@ export const AdminDashboardPage: React.FC = () => {
 
   if (isLoading && !stats) {
     return (
-      <div className="py-12">
-        <LoadingSpinner size="lg" label="Compiling live complaint statistics from Google Sheets..." />
+      <div className="space-y-6 sm:space-y-8 animate-fade-in">
+        {/* Banner Skeleton */}
+        <div className="h-32 bg-slate-200/80 rounded-3xl animate-pulse" />
+        {/* 5 KPI Stat Cards Skeleton */}
+        <DashboardStatsSkeleton />
+        {/* Recent Complaints Table Skeleton */}
+        <div className="space-y-3">
+          <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
+          <TableSkeleton rows={5} />
+        </div>
       </div>
     );
   }
@@ -53,7 +61,7 @@ export const AdminDashboardPage: React.FC = () => {
             Welcome back, {admin?.name || 'Administrator'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-            Real-time grievance monitoring for {ENV.COLLEGE_NAME}. Monitor incoming reports, assign proctors, and post resolutions.
+            Real-time complaint monitoring for {ENV.COLLEGE_NAME}. Monitor incoming reports, assign proctors, and post resolutions.
           </p>
         </div>
 
@@ -68,7 +76,7 @@ export const AdminDashboardPage: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
-          label="Total Grievances"
+          label="Total Complaints"
           value={stats?.total || 0}
           icon={<Inbox className="w-6 h-6" />}
           color="blue"
@@ -108,7 +116,7 @@ export const AdminDashboardPage: React.FC = () => {
           value={stats?.critical || 0}
           icon={<AlertTriangle className="w-6 h-6" />}
           color="rose"
-          subtitle="High-priority grievances"
+          subtitle="High-priority complaints"
           onClick={() => navigate('/admin/complaints?priority=Critical')}
         />
       </div>
