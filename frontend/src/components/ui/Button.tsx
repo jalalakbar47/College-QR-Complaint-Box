@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost' | 'success';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
@@ -20,28 +20,29 @@ export const Button: React.FC<ButtonProps> = ({
   rightIcon,
   ...props
 }) => {
+  // Shared design system button: rounded-lg, font-medium, 150ms transition, no scale/bounce, visible focus rings
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+    'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-registrar-blue focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
   const sizeClasses = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5',
-    md: 'text-sm px-4 py-2.5 gap-2',
-    lg: 'text-base px-6 py-3.5 gap-2.5 shadow-sm font-semibold',
+    sm: 'text-xs px-3 py-1.5 min-h-[36px] gap-1.5',
+    md: 'text-sm px-4 py-2.5 min-h-[44px] gap-2',
+    lg: 'text-base px-5 py-3 min-h-[48px] gap-2.5',
   };
 
   const variantClasses = {
     primary:
-      'bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white shadow-sm hover:shadow focus:ring-brand-500 border border-transparent',
+      'bg-registrar-blue hover:bg-registrar-blue/90 active:bg-registrar-blue text-white shadow-sm border border-transparent',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 focus:ring-slate-400 border border-slate-200/80',
-    outline:
-      'bg-transparent hover:bg-slate-50 active:bg-slate-100 text-slate-700 border border-slate-300 focus:ring-brand-500',
-    danger:
-      'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-sm focus:ring-rose-500 border border-transparent',
-    success:
-      'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-sm focus:ring-emerald-500 border border-transparent',
+      'bg-paper-card hover:bg-paper active:bg-paper/80 text-ink-navy border border-hairline shadow-sm',
     ghost:
-      'bg-transparent hover:bg-slate-100 active:bg-slate-200 text-slate-600 hover:text-slate-900 focus:ring-slate-400',
+      'bg-transparent hover:bg-hairline/60 active:bg-hairline text-ink-muted hover:text-ink-navy border border-transparent',
+    outline:
+      'bg-transparent hover:bg-paper active:bg-hairline/40 text-ink-navy border border-hairline',
+    danger:
+      'bg-case-red hover:bg-case-red/90 active:bg-case-red text-white shadow-sm border border-transparent focus-visible:ring-case-red',
+    success:
+      'bg-ledger-green hover:bg-ledger-green/90 active:bg-ledger-green text-white shadow-sm border border-transparent focus-visible:ring-ledger-green',
   };
 
   return (

@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -58,33 +59,40 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 px-4">
-      {/* Glow effect */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-600/15 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-ink-navy flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Subtle fine dot-grid texture on full-bleed ink-navy background */}
+      <div className="absolute inset-0 bg-dots-pattern opacity-10 pointer-events-none" />
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative text-center mb-8">
-        <Link to="/" className="inline-flex items-center justify-center mb-4 group">
-          <div className="w-14 h-14 rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-            <ShieldCheck className="w-8 h-8" />
+      {/* Centered Institutional Login Card */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm relative z-10">
+        <Card className="p-6 sm:p-8 bg-paper-card border border-hairline shadow-lg rounded-xl">
+          {/* Top Seal-Gold Official Badge */}
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-12 rounded-full bg-seal-gold/15 border border-seal-gold/30 flex items-center justify-center text-seal-gold shadow-sm">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
           </div>
-        </Link>
-        <span className="block text-xs font-bold uppercase tracking-widest text-brand-400 mb-1">
-          {ENV.COLLEGE_NAME}
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-wider sm:tracking-widest">
-          Chief Proctor Panel
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-2">
-          Authorized administrative access to campus complaint records
-        </p>
-      </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative">
-        <Card className="p-6 sm:p-8 bg-white border border-slate-200/90 shadow-2xl rounded-2xl">
+          {/* Institutional Title & Subtitle */}
+          <div className="text-center mb-6">
+            <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-ink-muted font-medium block mb-1">
+              {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink-navy tracking-tight mb-1">
+              Chief Proctor Panel
+            </h1>
+            <p className="text-xs text-ink-muted leading-relaxed">
+              Authorized administrative access to campus complaint records
+            </p>
+          </div>
+
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Subtle Inline Error State */}
             {errorMessage && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
-                {errorMessage}
+              <div className="p-3 rounded-lg bg-case-red/10 border border-case-red/20 text-case-red text-xs font-medium flex items-center gap-2 animate-fade-in">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span className="leading-snug">{errorMessage}</span>
               </div>
             )}
 
@@ -95,8 +103,12 @@ export const AdminLoginPage: React.FC = () => {
                 required
                 placeholder="proctor@college.edu"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                leftIcon={<Mail className="w-4 h-4 text-slate-500" />}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errorMessage) setErrorMessage(null);
+                }}
+                leftIcon={<Mail className="w-4 h-4 text-ink-muted" />}
+                className={errorMessage ? 'border-case-red/50' : ''}
               />
             </div>
 
@@ -107,19 +119,23 @@ export const AdminLoginPage: React.FC = () => {
                 required
                 placeholder="••••••••"
                 value={passkey}
-                onChange={(e) => setPasskey(e.target.value)}
-                leftIcon={<KeyRound className="w-4 h-4 text-slate-500" />}
+                onChange={(e) => {
+                  setPasskey(e.target.value);
+                  if (errorMessage) setErrorMessage(null);
+                }}
+                leftIcon={<KeyRound className="w-4 h-4 text-ink-muted" />}
+                className={errorMessage ? 'border-case-red/50' : ''}
                 rightIcon={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400 hover:text-slate-600 focus:outline-none transition-colors p-1"
+                    className="text-ink-muted hover:text-ink-navy focus:outline-none transition-colors p-1"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-slate-600" />
+                      <EyeOff className="w-4 h-4" />
                     ) : (
-                      <Eye className="w-4 h-4 text-slate-500" />
+                      <Eye className="w-4 h-4" />
                     )}
                   </button>
                 }
@@ -130,8 +146,8 @@ export const AdminLoginPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="primary"
-                size="lg"
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 shadow-md shadow-brand-500/20"
+                size="md"
+                className="w-full font-medium py-3 min-h-[44px]"
                 isLoading={isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
@@ -141,10 +157,11 @@ export const AdminLoginPage: React.FC = () => {
           </form>
         </Card>
 
+        {/* Quiet Back Link */}
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-xs text-slate-300 hover:text-white font-medium transition-colors inline-flex items-center gap-1 hover:underline"
+            className="text-xs font-mono text-ink-muted hover:text-white transition-colors inline-flex items-center gap-1 hover:underline"
           >
             ← Return to Student Portal Home
           </Link>

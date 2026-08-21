@@ -29,41 +29,41 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+          <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-wider text-ink-navy mb-1.5 font-mono">
             {label}
-            {requiredIndicator && <span className="text-rose-500 ml-1 font-bold">*</span>}
+            {requiredIndicator && <span className="text-case-red ml-1 font-bold">*</span>}
           </label>
         )}
-        <div className="relative rounded-xl shadow-subtle">
+        <div className="relative rounded-lg shadow-subtle">
           {leftIcon && (
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-muted">
               {leftIcon}
             </div>
           )}
           <input
             id={inputId}
             ref={ref}
-            className={`block w-full rounded-xl border bg-white text-slate-900 placeholder:text-slate-400 text-sm transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed ${
+            className={`block w-full rounded-lg border bg-paper-card text-ink-navy placeholder:text-ink-muted text-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed min-h-[44px] ${
               leftIcon ? 'pl-10' : 'pl-3.5'
             } ${rightIcon ? 'pr-10' : 'pr-3.5'} py-2.5 ${
               error
-                ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20 text-rose-900 bg-rose-50/20'
-                : 'border-slate-300 hover:border-slate-400 focus:border-brand-500 focus:ring-brand-500/20'
+                ? 'border-case-red/50 focus:border-case-red focus:ring-case-red/20 text-case-red bg-case-red/5'
+                : 'border-hairline hover:border-ink-muted/40'
             } ${className}`}
             {...props}
           />
           {rightIcon && (
-            <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400">
+            <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-ink-muted">
               {rightIcon}
             </div>
           )}
         </div>
         {error ? (
-          <p className="mt-1.5 text-xs text-rose-600 font-medium flex items-center gap-1">
+          <p className="mt-1.5 text-xs text-case-red font-medium flex items-center gap-1">
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>
+          <p className="mt-1.5 text-xs text-ink-muted">{helperText}</p>
         ) : null}
       </div>
     );

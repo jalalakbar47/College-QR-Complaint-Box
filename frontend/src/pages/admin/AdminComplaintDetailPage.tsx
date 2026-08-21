@@ -8,6 +8,7 @@ import { useRefresh } from '../../contexts/RefreshContext';
 import { ComplaintDetailView } from '../../components/complaints/ComplaintDetailView';
 import { ComplaintDetailSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
+import { Button } from '../../components/ui/Button';
 
 export const AdminComplaintDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -75,9 +76,10 @@ export const AdminComplaintDetailPage: React.FC = () => {
     return (
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between gap-4">
-          <Link to="/admin/complaints" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Complaints</span>
+          <Link to="/admin/complaints">
+            <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+              Back to Complaints
+            </Button>
           </Link>
         </div>
         <ComplaintDetailSkeleton />
@@ -88,9 +90,10 @@ export const AdminComplaintDetailPage: React.FC = () => {
   if (error || !complaint) {
     return (
       <div className="py-8 space-y-4">
-        <Link to="/admin/complaints" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline">
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Complaints</span>
+        <Link to="/admin/complaints">
+          <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
+            Back to Complaints
+          </Button>
         </Link>
         <ErrorState
           title="Complaint Record Not Found"
@@ -102,19 +105,22 @@ export const AdminComplaintDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Navigation Breadcrumb Bar */}
       <div className="flex items-center justify-between gap-4">
-        <Link
-          to="/admin/complaints"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs transition-all hover:scale-105 active:scale-95"
-        >
-          <ArrowLeft className="w-4 h-4 text-brand-600" />
-          <span>Back to Complaints</span>
+        <Link to="/admin/complaints">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-ink-muted hover:text-ink-navy"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+          >
+            Back to Complaints
+          </Button>
         </Link>
 
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="flex items-center gap-2 font-mono text-xs text-ink-muted">
+          <span className="w-2 h-2 rounded-full bg-ledger-green animate-pulse" />
           <span className="hidden sm:inline font-medium">Real-time sync active</span>
         </div>
       </div>

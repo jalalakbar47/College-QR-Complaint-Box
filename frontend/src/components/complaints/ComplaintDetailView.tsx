@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ShieldAlert,
-  ShieldCheck,
   User,
   MapPin,
-  Calendar,
   Clock,
   Save,
   Building,
@@ -17,17 +15,16 @@ import {
   Printer,
   Sparkles,
   ArrowRight,
-  UserCheck,
   Tag,
   GraduationCap,
   MessageSquareQuote,
   Flame,
   Zap,
   Trash2,
+  Edit3,
 } from 'lucide-react';
 import { Admin, Complaint, ComplaintPriority, ComplaintStatus, UpdateComplaintDTO } from '../../types';
-import { ComplaintStatusBadge } from './ComplaintStatusBadge';
-import { PriorityBadge } from './PriorityBadge';
+import { Pill } from '../ui/Pill';
 import { Card, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -57,6 +54,30 @@ const STATUS_STEPS: { status: ComplaintStatus; label: string; desc: string }[] =
   { status: 'In Progress', label: 'In Progress', desc: 'Action underway' },
   { status: 'Resolved', label: 'Resolved', desc: 'Solution deployed' },
 ];
+
+function mapStatusToPillVariant(status: string) {
+  const s = status.toLowerCase();
+  if (s === 'new') return 'new';
+  if (s === 'in progress' || s === 'in-progress' || s === 'under review' || s === 'assigned') return 'in-progress';
+  if (s === 'resolved') return 'resolved';
+  if (s === 'rejected') return 'rejected';
+  if (s === 'closed') return 'closed';
+  return 'new';
+}
+
+function mapPriorityToPillVariant(priority: string) {
+  switch (priority) {
+    case 'Critical':
+      return 'critical';
+    case 'High':
+      return 'in-progress';
+    case 'Medium':
+      return 'new';
+    case 'Low':
+    default:
+      return 'neutral';
+  }
+}
 
 export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
   complaint,
@@ -183,304 +204,284 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* 1. Hero Ticket Intelligence Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-brand-950 text-white p-6 sm:p-8 shadow-card border border-slate-700/60">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
-            {/* Badges Bar */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              {/* Complaint ID with Copy Button */}
-              <button
-                onClick={handleCopyId}
-                className="group inline-flex items-center gap-1.5 font-mono text-xs font-bold text-brand-300 bg-brand-500/15 hover:bg-brand-500/25 px-3 py-1 rounded-lg border border-brand-400/30 transition-all active:scale-95"
-                title="Click to copy Ticket ID"
-              >
-                <span>{complaint.complaint_id}</span>
-                {copiedId ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5 text-brand-300 group-hover:text-white transition-colors" />
-                )}
-              </button>
-
-              <PriorityBadge priority={complaint.priority} />
-              <ComplaintStatusBadge status={complaint.status} />
-
-              {complaint.is_anonymous ? (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Anonymous Report</span>
-                </span>
+      {/* 1. Header Card (ink-navy, rounded-2xl with TicketStub signature divider) */}
+      <div className="relative overflow-hidden rounded-2xl bg-ink-navy text-white p-6 sm:p-8 border border-ink-navy shadow-md">
+        {/* Top Meta Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {/* Reference ID Chip */}
+            <button
+              onClick={handleCopyId}
+              className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-white bg-white/10 hover:bg-white/15 px-3 py-1 rounded-lg border border-white/20 transition-colors"
+              title="Click to copy Reference ID"
+            >
+              <span>{complaint.complaint_id}</span>
+              {copiedId ? (
+                <Check className="w-3.5 h-3.5 text-ledger-green" />
               ) : (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-300 bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-500/30">
-                  <UserCheck className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Identified Student</span>
-                </span>
+                <Copy className="w-3.5 h-3.5 text-slate-300" />
               )}
-            </div>
+            </button>
 
-            {/* Ticket Subject */}
-            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-              {complaint.title}
-            </h1>
+            <Pill
+              variant={mapPriorityToPillVariant(complaint.priority) as any}
+              size="sm"
+              label={complaint.priority}
+            />
 
-            {/* Key Metadata Pills */}
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-slate-300 pt-1">
-              <span className="flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-brand-400" />
-                <span className="font-semibold text-white">{complaint.category}</span>
-              </span>
-              <span className="text-slate-600">•</span>
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                <span className="font-semibold text-white">{complaint.location}</span>
-              </span>
-              {complaint.department && (
-                <>
-                  <span className="text-slate-600">•</span>
-                  <span className="flex items-center gap-1.5">
-                    <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{complaint.department}</span>
-                  </span>
-                </>
-              )}
-            </div>
+            <Pill
+              variant={mapStatusToPillVariant(complaint.status) as any}
+              size="sm"
+              label={complaint.status}
+            />
+
+            {complaint.is_anonymous ? (
+              <Pill variant="resolved" size="sm" label="Anonymous Report" />
+            ) : (
+              <Pill variant="new" size="sm" label="Identified Student" />
+            )}
           </div>
 
-          {/* Quick Actions & Date Meta */}
-          <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end justify-between gap-4 border-t lg:border-t-0 border-slate-700/60 pt-4 lg:pt-0">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrint}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white bg-slate-800/80 hover:bg-slate-700/90 border border-slate-600/60 transition-all shadow-xs"
-                title="Print Official Complaint Record"
-              >
-                <Printer className="w-3.5 h-3.5 text-slate-300" />
-                <span>Print Slip</span>
-              </button>
+          {/* Top-Right Quick Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+              title="Print Official Complaint Record"
+            >
+              <Printer className="w-3.5 h-3.5 text-slate-300" />
+              <span>Print Slip</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/40 hover:bg-rose-900/60 border border-rose-700/50 transition-all shadow-xs"
-                title="Permanently Delete Complaint"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                <span>Delete</span>
-              </button>
-            </div>
-
-            <div className="space-y-1 text-right text-[11px] text-slate-400">
-              <div className="flex items-center gap-1.5 sm:justify-end">
-                <Calendar className="w-3 h-3 text-slate-500" />
-                <span>Logged: {formatDateTime(complaint.submitted_at)}</span>
-              </div>
-              <div className="flex items-center gap-1.5 sm:justify-end">
-                <Clock className="w-3 h-3 text-slate-500" />
-                <span>Last Modified: {formatDateTime(complaint.updated_at)}</span>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-case-red hover:bg-case-red/10 border border-case-red/40 transition-colors"
+              title="Permanently Delete Complaint"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-case-red" />
+              <span>Delete</span>
+            </button>
           </div>
         </div>
 
-        {/* 2. Visual Lifecycle Progress Stepper */}
+        {/* Complaint Title */}
+        <h1 className="font-serif text-xl sm:text-3xl font-normal text-white leading-tight mt-4 mb-2 tracking-tight">
+          {complaint.title}
+        </h1>
+
+        {/* Category & Location Sub-meta */}
+        <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-300">
+          <span className="flex items-center gap-1.5">
+            <Tag className="w-3.5 h-3.5 text-seal-gold" />
+            <span className="font-medium text-white">{complaint.category}</span>
+          </span>
+          <span className="text-white/20">•</span>
+          <span className="flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-seal-gold" />
+            <span className="font-medium text-white">{complaint.location}</span>
+          </span>
+          {complaint.department && (
+            <>
+              <span className="text-white/20">•</span>
+              <span className="flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
+                <span>{complaint.department}</span>
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Dashed Ticket-Stub Divider with Cut Notches */}
+        <div className="relative flex items-center w-full my-6 select-none" aria-hidden="true">
+          <div className="absolute -left-9 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-paper border border-hairline z-10" />
+          <div className="w-full border-b border-dashed border-white/20" />
+          <div className="absolute -right-9 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-paper border border-hairline z-10" />
+        </div>
+
+        {/* 3-Step Progress Tracker (Logged → In Progress → Resolved) */}
         {complaint.status !== 'Rejected' ? (
-          <div className="mt-8 pt-6 border-t border-slate-800/80">
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 relative">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 flex-1 max-w-xl">
               {STATUS_STEPS.map((step, idx) => {
                 const isPassed = currentStep > idx;
                 const isCurrent = currentStep === idx;
 
                 return (
-                  <div key={step.status} className="relative flex flex-col items-center text-center">
-                    {/* Circle Node */}
+                  <div key={step.status} className="flex flex-col items-center text-center">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm ${
-                        isPassed
-                          ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20'
-                          : isCurrent
-                          ? 'bg-brand-500 text-white ring-4 ring-brand-500/30 scale-110'
-                          : 'bg-slate-800 text-slate-500 border border-slate-700'
+                      className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-semibold transition-colors ${
+                        isCurrent
+                          ? 'bg-seal-gold text-white ring-4 ring-seal-gold/20'
+                          : isPassed
+                          ? 'bg-registrar-blue text-white'
+                          : 'bg-white/5 text-slate-400 border border-white/20'
                       }`}
                     >
-                      {isPassed ? <Check className="w-4 h-4" /> : idx + 1}
+                      {isPassed ? <Check className="w-3.5 h-3.5" /> : idx + 1}
                     </div>
-
-                    {/* Step Labels */}
                     <span
-                      className={`mt-2 text-xs font-bold ${
+                      className={`mt-1.5 text-xs font-medium ${
                         isCurrent
-                          ? 'text-brand-300'
+                          ? 'text-seal-gold font-semibold'
                           : isPassed
-                          ? 'text-emerald-400'
+                          ? 'text-white'
                           : 'text-slate-400'
                       }`}
                     >
                       {step.label}
                     </span>
-                    <span className="text-[10px] text-slate-400 hidden sm:inline">
-                      {step.desc}
-                    </span>
                   </div>
                 );
               })}
             </div>
+
+            {/* Timestamps */}
+            <div className="font-mono text-[11px] text-slate-400 space-y-0.5 sm:text-right flex-shrink-0">
+              <div>Logged: {formatDateTime(complaint.submitted_at)}</div>
+              <div>Last Modified: {formatDateTime(complaint.updated_at)}</div>
+            </div>
           </div>
         ) : (
-          <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center gap-2 text-xs text-rose-400 font-semibold">
-            <AlertTriangle className="w-4 h-4 text-rose-500" />
-            <span>This complaint was marked as Rejected / Closed by Proctorial Committee.</span>
+          <div className="flex items-center gap-2 text-xs text-case-red font-medium">
+            <AlertTriangle className="w-4 h-4" />
+            <span>This complaint was marked as Rejected / Closed by the Proctorial Committee.</span>
           </div>
         )}
       </div>
 
-      {/* Main 2-Column Grid */}
+      {/* 2. Two-Column Body Grid (7 cols / 5 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ========================================================================= */}
-        {/* LEFT COLUMN: Ticket Intelligence, Evidence, Student Identity (7 cols) */}
+        {/* LEFT COLUMN: Narrative & Student Verification (7 cols) */}
         {/* ========================================================================= */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Detailed Statement Card */}
-          <Card className="shadow-subtle hover:shadow-card transition-shadow">
+          {/* Student Complaint Statement Card */}
+          <Card>
             <CardHeader
               title={
-                <div className="flex items-center gap-2 text-slate-900 font-extrabold text-base sm:text-lg">
-                  <MessageSquareQuote className="w-5 h-5 text-brand-600" />
+                <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
+                  <MessageSquareQuote className="w-4.5 h-4.5 text-registrar-blue" />
                   <span>Student Complaint Statement</span>
                 </div>
               }
               subtitle="Full grievance narrative reported from campus QR node."
             />
 
-            {/* Quick Context Summary Boxes */}
+            {/* Category / Location 2-Up Info Tiles */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 flex-shrink-0">
-                  <Tag className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Category
-                  </span>
-                  <p className="font-extrabold text-slate-900 text-sm truncate">{complaint.category}</p>
-                  <Link
-                    to={`/admin/complaints?category=${encodeURIComponent(complaint.category)}`}
-                    className="text-[11px] font-semibold text-brand-600 hover:underline inline-flex items-center gap-0.5 mt-0.5"
-                  >
-                    <span>View same category</span>
-                    <ArrowRight className="w-2.5 h-2.5" />
-                  </Link>
-                </div>
+              <div className="p-3.5 rounded-xl bg-paper border border-hairline">
+                <span className="text-[10px] font-mono font-medium text-ink-muted uppercase tracking-wider block mb-0.5">
+                  Category
+                </span>
+                <p className="font-semibold text-ink-navy text-sm truncate">{complaint.category}</p>
+                <Link
+                  to={`/admin/complaints?category=${encodeURIComponent(complaint.category)}`}
+                  className="text-[11px] font-medium text-registrar-blue hover:underline inline-flex items-center gap-0.5 mt-1"
+                >
+                  <span>View same category</span>
+                  <ArrowRight className="w-2.5 h-2.5" />
+                </Link>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Incident Location
-                  </span>
-                  <p className="font-extrabold text-slate-900 text-sm truncate">{complaint.location}</p>
-                  <Link
-                    to={`/admin/complaints?location=${encodeURIComponent(complaint.location)}`}
-                    className="text-[11px] font-semibold text-brand-600 hover:underline inline-flex items-center gap-0.5 mt-0.5"
-                  >
-                    <span>View same location</span>
-                    <ArrowRight className="w-2.5 h-2.5" />
-                  </Link>
-                </div>
+              <div className="p-3.5 rounded-xl bg-paper border border-hairline">
+                <span className="text-[10px] font-mono font-medium text-ink-muted uppercase tracking-wider block mb-0.5">
+                  Incident Location
+                </span>
+                <p className="font-semibold text-ink-navy text-sm truncate">{complaint.location}</p>
+                <Link
+                  to={`/admin/complaints?location=${encodeURIComponent(complaint.location)}`}
+                  className="text-[11px] font-medium text-registrar-blue hover:underline inline-flex items-center gap-0.5 mt-1"
+                >
+                  <span>View same location</span>
+                  <ArrowRight className="w-2.5 h-2.5" />
+                </Link>
               </div>
             </div>
 
-            {/* Main Narrative Box */}
-            <div className="relative rounded-2xl bg-gradient-to-b from-slate-50 to-white p-5 sm:p-6 border border-slate-200">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
+            {/* Detailed Description Block */}
+            <div className="p-4 sm:p-5 rounded-lg bg-paper border border-hairline">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted block mb-2 font-medium">
                 Detailed Description
               </span>
-              <p className="text-slate-800 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-normal select-text">
+              <p className="text-ink-navy text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans">
                 {complaint.description}
               </p>
             </div>
           </Card>
 
-          {/* Student Profile / Security Identification Card */}
-          <Card className="shadow-subtle hover:shadow-card transition-shadow">
+          {/* Student Identity & Verification Card */}
+          <Card>
             <CardHeader
               title={
-                <div className="flex items-center gap-2 text-slate-900 font-extrabold text-base">
-                  <User className="w-5 h-5 text-slate-700" />
-                  <span>Student Identity & Verification</span>
+                <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
+                  <User className="w-4.5 h-4.5 text-ink-navy" />
+                  <span>Student Identity &amp; Verification</span>
                 </div>
               }
-              subtitle="Complainant profile details and contact information."
+              subtitle="Complainant profile details and contact verification."
             />
 
             {complaint.is_anonymous ? (
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50/70 via-teal-50/50 to-slate-50 border border-emerald-200/80 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 flex-shrink-0 shadow-xs">
-                  <ShieldAlert className="w-6 h-6" />
+              <div className="p-5 rounded-xl bg-ledger-green/10 border border-ledger-green/20 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                      100% Anonymous & Confidential
+                    <h4 className="font-semibold text-ink-navy text-sm sm:text-base">
+                      100% Anonymous &amp; Confidential
                     </h4>
-                    <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">
-                      Protected
-                    </span>
+                    <Pill variant="resolved" size="sm" label="Protected" />
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-ink-muted leading-relaxed">
                     The student submitted this complaint without personal identifiers to ensure unbiased reporting. Student rights and privacy are strictly safeguarded under the Proctorial Grievance Policy.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                {/* Student Bio Header */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-700 text-white flex items-center justify-center font-extrabold text-lg shadow-sm flex-shrink-0">
+              <div className="space-y-3.5">
+                {/* Student Bio Capsule */}
+                <div className="p-3.5 rounded-xl bg-paper border border-hairline flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-registrar-blue text-white flex items-center justify-center font-mono font-semibold text-sm flex-shrink-0">
                     {complaint.student_name ? complaint.student_name.slice(0, 2).toUpperCase() : 'ST'}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-base">{complaint.student_name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Roll No / ID: <span className="font-mono text-slate-700 font-bold">{complaint.student_id || 'N/A'}</span>
+                    <h4 className="font-semibold text-ink-navy text-sm">{complaint.student_name}</h4>
+                    <p className="text-xs font-mono text-ink-muted">
+                      Roll / ID: <span className="font-semibold text-ink-navy">{complaint.student_id || 'N/A'}</span>
                     </p>
                   </div>
                 </div>
 
-                {/* Academic & Contact Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">
+                {/* Key-Value Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-3 rounded-lg bg-paper border border-hairline">
+                    <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Department
                     </span>
-                    <p className="font-bold text-slate-800 flex items-center gap-1.5 text-xs sm:text-sm">
-                      <Building className="w-3.5 h-3.5 text-brand-600" />
+                    <p className="font-semibold text-ink-navy flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-registrar-blue" />
                       <span>{complaint.department || 'Not Specified'}</span>
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">
+                  <div className="p-3 rounded-lg bg-paper border border-hairline">
+                    <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Semester / Batch
                     </span>
-                    <p className="font-bold text-slate-800 flex items-center gap-1.5 text-xs sm:text-sm">
-                      <GraduationCap className="w-3.5 h-3.5 text-brand-600" />
+                    <p className="font-semibold text-ink-navy flex items-center gap-1.5">
+                      <GraduationCap className="w-3.5 h-3.5 text-registrar-blue" />
                       <span>{complaint.semester || 'Regular Semester'}</span>
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50/70 border border-slate-200 sm:col-span-2">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">
+                  <div className="p-3 rounded-lg bg-paper border border-hairline sm:col-span-2">
+                    <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Contact Phone / Email
                     </span>
-                    <p className="font-bold text-slate-800 flex items-center gap-1.5 text-xs sm:text-sm">
-                      <Phone className="w-3.5 h-3.5 text-brand-600" />
+                    <p className="font-semibold text-ink-navy flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-registrar-blue" />
                       <span>{complaint.contact || 'No direct phone recorded'}</span>
                     </p>
                   </div>
@@ -491,43 +492,43 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* RIGHT COLUMN: Proctor Action & Resolution Center (5 cols) */}
+        {/* RIGHT COLUMN: Proctor Action & Resolution (5 cols) */}
         {/* ========================================================================= */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="border-brand-200/90 shadow-elevated bg-gradient-to-b from-white to-slate-50/40">
+          <Card className="border-hairline shadow-sm">
             <CardHeader
               title={
-                <div className="flex items-center gap-2 text-slate-900 font-extrabold text-base sm:text-lg">
-                  <CheckCircle2 className="w-5 h-5 text-brand-600" />
-                  <span>Proctor Action & Resolution</span>
+                <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
+                  <Edit3 className="w-4.5 h-4.5 text-registrar-blue" />
+                  <span>Proctor Action &amp; Resolution</span>
                 </div>
               }
-              subtitle="Update ticket status, assign proctor, and post official resolution."
+              subtitle="Update ticket status, urgency level, and post official resolution note."
             />
 
             <form onSubmit={(e) => handleSave(e)} className="space-y-5">
-              {/* 1. Quick Status Selector Pills */}
+              {/* 1. Complaint Status: 2x2 Button-Group */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-mono font-medium text-ink-navy uppercase tracking-wider mb-2">
                   Complaint Status
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {(['New', 'In Progress', 'Resolved', 'Rejected'] as ComplaintStatus[]).map((st) => {
                     const isSelected = status === st;
-                    let activeStyles = 'bg-brand-600 text-white border-brand-600 shadow-sm';
-                    if (st === 'In Progress') activeStyles = 'bg-amber-600 text-white border-amber-600 shadow-sm';
-                    if (st === 'Resolved') activeStyles = 'bg-emerald-600 text-white border-emerald-600 shadow-sm';
-                    if (st === 'Rejected') activeStyles = 'bg-rose-600 text-white border-rose-600 shadow-sm';
+                    let selectedStyle = 'bg-registrar-blue text-white border-registrar-blue shadow-sm';
+                    if (st === 'In Progress') selectedStyle = 'bg-seal-gold text-white border-seal-gold shadow-sm';
+                    if (st === 'Resolved') selectedStyle = 'bg-ledger-green text-white border-ledger-green shadow-sm';
+                    if (st === 'Rejected') selectedStyle = 'bg-case-red text-white border-case-red shadow-sm';
 
                     return (
                       <button
                         type="button"
                         key={st}
                         onClick={() => setStatus(st)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                        className={`px-3 py-2.5 rounded-lg text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 ${
                           isSelected
-                            ? activeStyles
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                            ? selectedStyle
+                            : 'bg-paper text-ink-navy border-hairline hover:bg-paper-card'
                         }`}
                       >
                         {st === 'Resolved' && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -541,31 +542,31 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                 </div>
               </div>
 
-              {/* 2. Priority Urgency Selector Pills */}
+              {/* 2. Priority Urgency Level: 4-Across Button Group */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-mono font-medium text-ink-navy uppercase tracking-wider mb-2">
                   Priority Urgency Level
                 </label>
                 <div className="grid grid-cols-4 gap-1.5">
                   {(['Low', 'Medium', 'High', 'Critical'] as ComplaintPriority[]).map((pr) => {
                     const isSelected = priority === pr;
-                    let selectedClass = 'bg-slate-700 text-white border-slate-700';
-                    if (pr === 'Medium') selectedClass = 'bg-blue-600 text-white border-blue-600';
-                    if (pr === 'High') selectedClass = 'bg-amber-600 text-white border-amber-600';
-                    if (pr === 'Critical') selectedClass = 'bg-rose-600 text-white border-rose-600 animate-pulse';
+                    let selectedStyle = 'bg-ink-muted text-white border-ink-muted';
+                    if (pr === 'Medium') selectedStyle = 'bg-registrar-blue text-white border-registrar-blue';
+                    if (pr === 'High') selectedStyle = 'bg-seal-gold text-white border-seal-gold';
+                    if (pr === 'Critical') selectedStyle = 'bg-case-red text-white border-case-red';
 
                     return (
                       <button
                         type="button"
                         key={pr}
                         onClick={() => setPriority(pr)}
-                        className={`py-2 px-1 rounded-xl text-[11px] font-bold border transition-all text-center ${
+                        className={`py-2 px-1 rounded-lg text-[11px] font-medium border transition-colors text-center ${
                           isSelected
-                            ? selectedClass
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                            ? selectedStyle
+                            : 'bg-paper text-ink-muted border-hairline hover:bg-paper-card'
                         }`}
                       >
-                        {pr === 'Critical' && <Flame className="w-3 h-3 inline mr-1 text-amber-300" />}
+                        {pr === 'Critical' && <Flame className="w-3 h-3 inline mr-1 text-seal-gold" />}
                         {pr}
                       </button>
                     );
@@ -573,13 +574,13 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                 </div>
               </div>
 
-              {/* 3. Official Resolution Statement & Template Presets */}
+              {/* 3. Action Taken / Resolution Note Textarea */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <label className="block text-xs font-mono font-medium text-ink-navy uppercase tracking-wider">
                     Action Taken / Resolution Note
                   </label>
-                  <span className="text-[10px] text-slate-400">Publicly visible on tracking</span>
+                  <span className="text-[10px] font-mono text-ink-muted">Publicly visible on tracking</span>
                 </div>
 
                 <textarea
@@ -587,13 +588,13 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                   placeholder="Describe investigative findings, department work order numbers, or corrective actions taken..."
                   value={resolutionNote}
                   onChange={(e) => setResolutionNote(e.target.value)}
-                  className="w-full text-xs leading-relaxed p-3.5 rounded-2xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-inner resize-y min-h-[110px]"
+                  className="w-full text-xs sm:text-sm leading-relaxed p-3.5 rounded-lg border border-hairline bg-paper-card text-ink-navy placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue min-h-[110px]"
                 />
 
-                {/* Quick 1-Click Template Chips */}
+                {/* Quick Response Presets */}
                 <div className="mt-2.5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-1.5">
-                    <Zap className="w-3 h-3 text-amber-500" />
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted flex items-center gap-1 mb-1.5 font-medium">
+                    <Zap className="w-3 h-3 text-seal-gold" />
                     <span>Quick Response Presets</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -602,25 +603,25 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                         type="button"
                         key={idx}
                         onClick={() => handleApplyTemplate(tmpl)}
-                        className="text-[10px] text-slate-600 bg-slate-100 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-300 px-2.5 py-1 rounded-lg border border-slate-200/80 transition-colors text-left"
+                        className="text-[10px] text-ink-muted bg-paper hover:bg-registrar-blue/5 hover:text-registrar-blue hover:border-registrar-blue/30 px-2.5 py-1 rounded-lg border border-hairline transition-colors text-left"
                       >
-                        + {tmpl.slice(0, 38)}...
+                        + {tmpl.slice(0, 36)}...
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-3 space-y-2 border-t border-slate-200">
+              {/* 4. Primary Action Row */}
+              <div className="pt-3 space-y-2 border-t border-hairline">
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full font-extrabold py-3 rounded-xl shadow-md text-sm transition-transform active:scale-[0.99]"
+                  className="w-full py-3 text-sm font-medium"
                   isLoading={isUpdating}
                   leftIcon={<Save className="w-4 h-4" />}
                 >
-                  Save & Update Ticket
+                  Save &amp; Update Ticket
                 </Button>
 
                 {status !== 'Resolved' && (
@@ -628,33 +629,33 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     type="button"
                     onClick={handleQuickResolve}
                     disabled={isUpdating}
-                    className="w-full py-2 px-3 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-3 rounded-lg text-xs font-medium text-ledger-green bg-ledger-green/10 hover:bg-ledger-green/20 border border-ledger-green/30 transition-colors flex items-center justify-center gap-1.5"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>1-Click Mark as Resolved & Close</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-ledger-green" />
+                    <span>1-Click Mark as Resolved &amp; Close</span>
                   </button>
                 )}
               </div>
             </form>
           </Card>
 
-          {/* Danger Zone Card */}
-          <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-200/70 space-y-2">
+          {/* 5. Danger Zone: Isolated and Case-Red Tinted */}
+          <div className="p-4 rounded-xl bg-case-red/5 border border-case-red/20 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-rose-900 flex items-center gap-1.5">
-                <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-case-red flex items-center gap-1.5">
+                <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete Ticket</span>
               </span>
             </div>
-            <p className="text-[11px] text-rose-700 leading-relaxed">
+            <p className="text-[11px] text-ink-muted leading-relaxed">
               Permanently erase this complaint and its resolution log from the database.
             </p>
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="w-full mt-1 py-2 px-3 rounded-xl text-xs font-bold text-rose-700 bg-white hover:bg-rose-100/80 border border-rose-200 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full mt-1 py-2.5 px-3 rounded-lg text-xs font-medium text-white bg-case-red hover:bg-case-red/90 transition-colors flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+              <Trash2 className="w-3.5 h-3.5" />
               <span>Delete Complaint Permanently</span>
             </button>
           </div>

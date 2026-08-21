@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'neutral';
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'neutral' | 'gold';
   size?: 'sm' | 'md' | 'lg';
   dot?: boolean;
   dotColor?: string;
@@ -17,14 +17,15 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-slate-100 text-slate-700 border-slate-200/80',
-    primary: 'bg-brand-50 text-brand-700 border-brand-200/80',
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
-    warning: 'bg-amber-50 text-amber-700 border-amber-200/80',
-    danger: 'bg-rose-50 text-rose-700 border-rose-200/80',
-    info: 'bg-blue-50 text-blue-700 border-blue-200/80',
-    purple: 'bg-purple-50 text-purple-700 border-purple-200/80',
-    neutral: 'bg-gray-100 text-gray-600 border-gray-200',
+    default: 'bg-paper text-ink-muted border-hairline',
+    primary: 'bg-registrar-blue/10 text-registrar-blue border-registrar-blue/20',
+    success: 'bg-ledger-green/10 text-ledger-green border-ledger-green/20',
+    warning: 'bg-seal-gold/10 text-seal-gold border-seal-gold/20',
+    gold: 'bg-seal-gold/10 text-seal-gold border-seal-gold/20',
+    danger: 'bg-case-red/10 text-case-red border-case-red/20',
+    info: 'bg-registrar-blue/10 text-registrar-blue border-registrar-blue/20',
+    purple: 'bg-seal-gold/10 text-seal-gold border-seal-gold/20',
+    neutral: 'bg-paper text-ink-muted border-hairline',
   };
 
   const sizeStyles = {

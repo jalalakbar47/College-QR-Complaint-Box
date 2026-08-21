@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { MapPin, Calendar, User, Eye, AlertCircle, Trash2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { MapPin, Calendar, User, Eye, Trash2 } from 'lucide-react';
 import { Complaint } from '../../types';
-import { ComplaintStatusBadge } from './ComplaintStatusBadge';
+import { Pill } from '../ui/Pill';
 import { PriorityBadge } from './PriorityBadge';
 import { formatDateTime } from '../../utils/dateFormatter';
 
@@ -12,87 +12,130 @@ export interface ComplaintCardProps {
   onDelete?: (complaintId: string) => void;
 }
 
-export const ComplaintCard: React.FC<ComplaintCardProps> = ({ complaint, isAdmin = false, onDelete }) => {
+function mapStatusToPillVariant(status: string) {
+  const s = status.toLowerCase();
+  if (s === 'new') return 'new';
+  if (s === 'in progress' || s === 'in-progress' || s === 'under review' || s === 'assigned') return 'in-progress';
+  if (s === 'resolved') return 'resolved';
+  if (s === 'rejected') return 'rejected';
+  if (s === 'closed') return 'closed';
+  return 'new';
+}
+
+export const ComplaintCard: React.FC<ComplaintCardProps> = ({
+  complaint,
+  isAdmin = false,
+  onDelete,
+}) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger card navigation if clicking delete button
+    if ((e.target as HTMLElement).closest('button')) return;
+    if (isAdmin) {
+      navigate(`/admin/complaints/${complaint.complaint_id}`);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-subtle hover:shadow-card transition-all flex flex-col justify-between gap-3.5">
-      <div>
-        {/* Header with Reference ID & Badges */}
-        <div className="flex items-start justify-between gap-2 mb-2.5">
-          <span className="font-mono text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200/60">
+    <div
+      onClick={handleCardClick}
+      className="relative bg-paper-card rounded-xl border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-150 cursor-pointer"
+    >
+      {/* Top Part: ID + Status Pill */}
+      <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2">
+        <div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
+            REFERENCE ID
+          </span>
+          <span className="font-mono text-xs font-semibold text-ink-navy">
             {complaint.complaint_id}
           </span>
-          <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            <PriorityBadge priority={complaint.priority} />
-            <ComplaintStatusBadge status={complaint.status} />
-          </div>
         </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <PriorityBadge priority={complaint.priority} />
+          <Pill
+            variant={mapStatusToPillVariant(complaint.status) as any}
+            size="sm"
+            label={complaint.status}
+          />
+        </div>
+      </div>
 
+      {/* TicketStub Divider */}
+      <div className="relative flex items-center w-full select-none" aria-hidden="true">
+        <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-paper border border-hairline z-10" />
+        <div className="w-full border-b border-dashed border-hairline mx-2.5" />
+        <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-paper border border-hairline z-10" />
+      </div>
+
+      {/* Bottom Part: Details */}
+      <div className="p-3.5 sm:p-4 space-y-2.5">
         {/* Title */}
-        <h4 className="font-bold text-slate-900 text-sm sm:text-base leading-snug mb-1.5">
+        <h4 className="font-semibold text-ink-navy text-sm leading-snug">
           {complaint.title}
         </h4>
 
         {/* Category & Location */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mb-2.5">
-          <span className="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-ink-muted">
+          <span className="font-medium text-ink-navy bg-paper px-2 py-0.5 rounded border border-hairline">
             {complaint.category}
           </span>
           <div className="flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" />
-            <span>{complaint.location}</span>
+            <MapPin className="w-3.5 h-3.5 text-ink-muted" />
+            <span className="truncate max-w-[140px]">{complaint.location}</span>
           </div>
         </div>
 
         {/* Description snippet */}
-        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-ink-muted line-clamp-2 leading-relaxed">
           {complaint.description}
         </p>
-      </div>
 
-      {/* Footer Info & Action */}
-      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-400">
-        <div className="flex items-center gap-1">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{formatDateTime(complaint.submitted_at)}</span>
-        </div>
+        {/* Card Footer */}
+        <div className="pt-2.5 border-t border-hairline flex items-center justify-between gap-2 text-xs text-ink-muted">
+          <div className="flex items-center gap-1 font-mono text-[11px]">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formatDateTime(complaint.submitted_at)}</span>
+          </div>
 
-        {isAdmin ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {complaint.is_anonymous ? (
-              <span className="text-[11px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Anonymous</span>
+              <Pill variant="neutral" size="sm" label="Anonymous" />
             ) : (
-              <div className="flex items-center gap-1 text-[11px] text-slate-600 font-medium truncate max-w-[90px]">
-                <User className="w-3 h-3 text-slate-400" />
+              <div className="flex items-center gap-1 text-[11px] text-ink-navy font-medium truncate max-w-[100px]">
+                <User className="w-3 h-3 text-ink-muted" />
                 <span className="truncate">{complaint.student_name}</span>
               </div>
             )}
-            <Link
-              to={`/admin/complaints/${complaint.complaint_id}`}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors"
-              title="View Details"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>View</span>
-            </Link>
-            {onDelete && (
-              <button
-                type="button"
-                onClick={() => onDelete(complaint.complaint_id)}
-                className="p-1 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                title="Delete Complaint"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+
+            {isAdmin && (
+              <div className="flex items-center gap-1">
+                <Link
+                  to={`/admin/complaints/${complaint.complaint_id}`}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-registrar-blue hover:bg-registrar-blue/10 border border-registrar-blue/20 transition-colors"
+                  title="View Details"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>View</span>
+                </Link>
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(complaint.complaint_id);
+                    }}
+                    className="p-1 rounded-lg text-ink-muted hover:text-case-red hover:bg-case-red/10 border border-transparent hover:border-case-red/20 transition-colors"
+                    title="Delete Complaint"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        ) : (
-          complaint.resolution && (
-            <div className="flex items-center gap-1 text-emerald-600 font-medium">
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>Resolution Posted</span>
-            </div>
-          )
-        )}
+        </div>
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ export const RecentComplaints: React.FC<RecentComplaintsProps> = ({
         action={
           <Link
             to="/admin/complaints"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-medium text-registrar-blue hover:underline"
           >
             <span>View All</span>
             <ArrowRight className="w-3.5 h-3.5" />

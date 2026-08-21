@@ -12,7 +12,7 @@ export const AdminLayout: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-paper">
         <LoadingSpinner size="lg" label="Validating administrator credentials..." />
       </div>
     );
@@ -35,8 +35,8 @@ export const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-paper text-ink-navy flex">
+      {/* Persistent Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content Area */}

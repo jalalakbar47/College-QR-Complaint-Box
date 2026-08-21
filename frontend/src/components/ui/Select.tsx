@@ -37,19 +37,19 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={selectId} className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+          <label htmlFor={selectId} className="block text-xs font-medium uppercase tracking-wider text-ink-navy mb-1.5 font-mono">
             {label}
-            {requiredIndicator && <span className="text-rose-500 ml-1 font-bold">*</span>}
+            {requiredIndicator && <span className="text-case-red ml-1 font-bold">*</span>}
           </label>
         )}
-        <div className="relative rounded-xl shadow-subtle">
+        <div className="relative rounded-lg shadow-subtle">
           <select
             id={selectId}
             ref={ref}
-            className={`block w-full appearance-none rounded-xl border bg-white text-slate-900 text-sm px-3.5 py-2.5 pr-10 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer ${
+            className={`block w-full appearance-none rounded-lg border bg-paper-card text-ink-navy text-sm px-3.5 py-2.5 pr-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed cursor-pointer min-h-[44px] ${
               error
-                ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20 text-rose-900 bg-rose-50/20'
-                : 'border-slate-300 hover:border-slate-400 focus:border-brand-500 focus:ring-brand-500/20'
+                ? 'border-case-red/50 focus:border-case-red focus:ring-case-red/20 text-case-red bg-case-red/5'
+                : 'border-hairline hover:border-ink-muted/40'
             } ${className}`}
             {...props}
           >
@@ -65,14 +65,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
             {children}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-ink-muted">
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
         {error ? (
-          <p className="mt-1.5 text-xs text-rose-600 font-medium">{error}</p>
+          <p className="mt-1.5 text-xs text-case-red font-medium">{error}</p>
         ) : helperText ? (
-          <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>
+          <p className="mt-1.5 text-xs text-ink-muted">{helperText}</p>
         ) : null}
       </div>
     );

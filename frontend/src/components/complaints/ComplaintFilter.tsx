@@ -38,11 +38,12 @@ export const ComplaintFilter: React.FC<ComplaintFilterProps> = ({
     filters.department !== 'All';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-subtle mb-6">
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-sm sm:text-base">
-          <Filter className="w-4 h-4 text-brand-600" />
-          <span>Filter & Search Complaints</span>
+    <div className="bg-paper-card rounded-xl border border-hairline p-4 sm:p-5 shadow-sm mb-6 space-y-4">
+      {/* Header Row */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-ink-navy font-semibold text-xs sm:text-sm uppercase tracking-wider font-mono">
+          <Filter className="w-4 h-4 text-registrar-blue" />
+          <span>Filter &amp; Search Complaints</span>
         </div>
         {isFiltered && (
           <Button
@@ -50,105 +51,99 @@ export const ComplaintFilter: React.FC<ComplaintFilterProps> = ({
             size="sm"
             onClick={onReset}
             leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-            className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+            className="text-xs text-case-red hover:text-case-red hover:bg-case-red/10"
           >
             Clear Filters
           </Button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-        {/* Search Box */}
-        <div className="lg:col-span-2">
-          <Input
-            placeholder="Search by ID, keyword, student name..."
-            leftIcon={<Search className="w-4 h-4" />}
-            value={filters.search}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
-          />
-        </div>
+      {/* Row 1: Search Input (Full Width) */}
+      <div>
+        <Input
+          placeholder="Search by ID, keyword, student name..."
+          leftIcon={<Search className="w-4 h-4 text-ink-muted" />}
+          value={filters.search}
+          onChange={(e) => onFilterChange({ search: e.target.value })}
+          className="font-medium"
+        />
+      </div>
 
+      {/* Row 2: 4 Select Dropdowns Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Status Filter */}
-        <div>
-          <Select
-            value={filters.status}
-            onChange={(e) => onFilterChange({ status: e.target.value })}
-            options={[
-              { value: 'All', label: 'All Statuses' },
-              { value: 'New', label: 'New' },
-              { value: 'Under Review', label: 'Under Review' },
-              { value: 'Assigned', label: 'Assigned' },
-              { value: 'In Progress', label: 'In Progress' },
-              { value: 'Resolved', label: 'Resolved' },
-              { value: 'Rejected', label: 'Rejected' },
-              { value: 'Closed', label: 'Closed' },
-            ]}
-          />
-        </div>
+        <Select
+          value={filters.status}
+          onChange={(e) => onFilterChange({ status: e.target.value })}
+          options={[
+            { value: 'All', label: 'All Statuses' },
+            { value: 'New', label: 'New' },
+            { value: 'Under Review', label: 'Under Review' },
+            { value: 'Assigned', label: 'Assigned' },
+            { value: 'In Progress', label: 'In Progress' },
+            { value: 'Resolved', label: 'Resolved' },
+            { value: 'Rejected', label: 'Rejected' },
+            { value: 'Closed', label: 'Closed' },
+          ]}
+        />
 
         {/* Priority Filter */}
-        <div>
-          <Select
-            value={filters.priority}
-            onChange={(e) => onFilterChange({ priority: e.target.value })}
-            options={[
-              { value: 'All', label: 'All Priorities' },
-              { value: 'Critical', label: 'Critical' },
-              { value: 'High', label: 'High' },
-              { value: 'Medium', label: 'Medium' },
-              { value: 'Low', label: 'Low' },
-            ]}
-          />
-        </div>
+        <Select
+          value={filters.priority}
+          onChange={(e) => onFilterChange({ priority: e.target.value })}
+          options={[
+            { value: 'All', label: 'All Priorities' },
+            { value: 'Critical', label: 'Critical' },
+            { value: 'High', label: 'High' },
+            { value: 'Medium', label: 'Medium' },
+            { value: 'Low', label: 'Low' },
+          ]}
+        />
 
         {/* Category Filter */}
-        <div>
-          <Select
-            value={filters.category}
-            onChange={(e) => onFilterChange({ category: e.target.value })}
-            options={[
-              { value: 'All', label: 'All Categories' },
-              ...categories.map((c) => ({
-                value: c.category_name,
-                label: c.category_name,
-              })),
-            ]}
-          />
-        </div>
+        <Select
+          value={filters.category}
+          onChange={(e) => onFilterChange({ category: e.target.value })}
+          options={[
+            { value: 'All', label: 'All Categories' },
+            ...categories.map((c) => ({
+              value: c.category_name,
+              label: c.category_name,
+            })),
+          ]}
+        />
 
         {/* Location Filter */}
-        <div>
+        <Select
+          value={filters.location}
+          onChange={(e) => onFilterChange({ location: e.target.value })}
+          options={[
+            { value: 'All', label: 'All Locations' },
+            ...locations.map((l) => ({
+              value: l.location_name,
+              label: l.location_name,
+            })),
+          ]}
+        />
+      </div>
+
+      {/* Row 3: Department Select (Full Width with Small-Caps Mono Label) */}
+      <div className="pt-2 border-t border-hairline flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <span className="font-mono text-xs uppercase tracking-wider text-ink-muted whitespace-nowrap font-medium">
+          Department:
+        </span>
+        <div className="flex-1">
           <Select
-            value={filters.location}
-            onChange={(e) => onFilterChange({ location: e.target.value })}
+            value={filters.department}
+            onChange={(e) => onFilterChange({ department: e.target.value })}
             options={[
-              { value: 'All', label: 'All Locations' },
-              ...locations.map((l) => ({
-                value: l.location_name,
-                label: l.location_name,
+              { value: 'All', label: 'All Academic Departments' },
+              ...DEPARTMENTS.map((d) => ({
+                value: d,
+                label: d,
               })),
             ]}
           />
-        </div>
-
-        {/* Department Filter */}
-        <div className="sm:col-span-2 lg:col-span-6">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Department:</span>
-            <div className="flex-1">
-              <Select
-                value={filters.department}
-                onChange={(e) => onFilterChange({ department: e.target.value })}
-                options={[
-                  { value: 'All', label: 'All Academic Departments' },
-                  ...DEPARTMENTS.map((d) => ({
-                    value: d,
-                    label: d,
-                  })),
-                ]}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

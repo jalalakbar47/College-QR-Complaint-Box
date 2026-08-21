@@ -23,31 +23,33 @@ export const Pagination: React.FC<PaginationProps> = ({
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-white border-t border-slate-200 text-xs sm:text-sm text-slate-600">
-      <div>
-        Showing <span className="font-semibold text-slate-900">{startItem}</span> to{' '}
-        <span className="font-semibold text-slate-900">{endItem}</span> of{' '}
-        <span className="font-semibold text-slate-900">{totalItems}</span> results
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 bg-paper-card border border-hairline rounded-xl text-xs text-ink-muted shadow-sm">
+      <div className="font-mono text-xs">
+        Showing <span className="font-semibold text-ink-navy">{startItem}</span> to{' '}
+        <span className="font-semibold text-ink-navy">{endItem}</span> of{' '}
+        <span className="font-semibold text-ink-navy">{totalItems}</span> results
       </div>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
           leftIcon={<ChevronLeft className="w-4 h-4" />}
+          className="text-xs"
         >
           Previous
         </Button>
-        <div className="text-xs font-medium text-slate-700 px-2">
+        <div className="text-xs font-mono font-medium text-ink-navy px-2">
           Page {currentPage} of {totalPages}
         </div>
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
           rightIcon={<ChevronRight className="w-4 h-4" />}
+          className="text-xs"
         >
           Next
         </Button>

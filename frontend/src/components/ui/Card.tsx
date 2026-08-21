@@ -3,6 +3,7 @@ import React from 'react';
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'flat' | 'bordered';
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  interactive?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -10,13 +11,14 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   variant = 'default',
   padding = 'md',
+  interactive = false,
   ...props
 }) => {
   const variantClasses = {
-    default: 'bg-white border border-slate-200/80 shadow-subtle',
-    elevated: 'bg-white border border-slate-200/60 shadow-elevated',
-    flat: 'bg-slate-50 border border-slate-200/60',
-    bordered: 'bg-white border-2 border-slate-200',
+    default: 'bg-paper-card border border-hairline shadow-sm',
+    elevated: 'bg-paper-card border border-hairline shadow-elevated',
+    flat: 'bg-paper border border-hairline',
+    bordered: 'bg-paper-card border-2 border-hairline',
   };
 
   const paddingClasses = {
@@ -28,7 +30,9 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div
-      className={`rounded-2xl transition-all duration-200 ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}
+      className={`rounded-xl transition-shadow duration-150 ${variantClasses[variant]} ${
+        paddingClasses[padding]
+      } ${interactive ? 'hover:shadow-md cursor-pointer' : ''} ${className}`}
       {...props}
     >
       {children}
@@ -50,8 +54,8 @@ export const CardHeader: React.FC<{
       ) : (
         <>
           <div>
-            {title && <h3 className="font-semibold text-slate-900 text-base sm:text-lg">{title}</h3>}
-            {subtitle && <p className="text-xs sm:text-sm text-slate-500 mt-0.5">{subtitle}</p>}
+            {title && <h3 className="font-semibold text-ink-navy text-base sm:text-lg">{title}</h3>}
+            {subtitle && <p className="text-xs sm:text-sm text-ink-muted mt-0.5">{subtitle}</p>}
           </div>
           {action && <div className="flex-shrink-0">{action}</div>}
         </>

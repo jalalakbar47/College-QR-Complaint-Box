@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Inbox, MapPin, Trash2 } from 'lucide-react';
 import { Complaint } from '../../types';
-import { ComplaintStatusBadge } from './ComplaintStatusBadge';
+import { Pill } from '../ui/Pill';
 import { PriorityBadge } from './PriorityBadge';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../ui/Table';
 import { ComplaintCard } from './ComplaintCard';
@@ -19,11 +19,22 @@ export interface ComplaintTableProps {
   onDeleted?: () => void;
 }
 
+function mapStatusToPillVariant(status: string) {
+  const s = status.toLowerCase();
+  if (s === 'new') return 'new';
+  if (s === 'in progress' || s === 'in-progress' || s === 'under review' || s === 'assigned') return 'in-progress';
+  if (s === 'resolved') return 'resolved';
+  if (s === 'rejected') return 'rejected';
+  if (s === 'closed') return 'closed';
+  return 'new';
+}
+
 export const ComplaintTable: React.FC<ComplaintTableProps> = ({
   complaints,
   isLoading = false,
   onDeleted,
 }) => {
+  const navigate = useNavigate();
   const { admin } = useAuth();
   const { success, error } = useToast();
 
@@ -57,7 +68,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
   if (complaints.length === 0 && !isLoading) {
     return (
       <EmptyState
-        icon={<Inbox className="w-8 h-8 text-slate-400" />}
+        icon={<Inbox className="w-8 h-8 text-ink-muted" />}
         title="No Complaints Found"
         description="No complaint records match your current filter and search criteria."
       />
@@ -66,7 +77,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
 
   return (
     <>
-      {/* Mobile Card Layout (< 768px) */}
+      {/* Mobile Card Layout (< 768px): Compact TicketStub cards */}
       <div className="grid grid-cols-1 gap-3.5 md:hidden">
         {complaints.map((c) => (
           <ComplaintCard
@@ -78,105 +89,135 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
         ))}
       </div>
 
-      {/* Desktop Table View (>= 768px) */}
-      <div className="hidden md:block w-full">
+      {/* Desktop Table View (>= 768px) with Compact TicketStub Influence & Clickable Rows */}
+      <div className="hidden md:block w-full overflow-x-auto rounded-xl border border-hairline bg-paper-card shadow-sm">
         <Table className="table-auto w-full">
           <TableHead>
-            <TableRow>
-              <TableHeaderCell className="w-36">ID & Date</TableHeaderCell>
-              <TableHeaderCell className="w-44">Category / Location</TableHeaderCell>
-              <TableHeaderCell>Complaint Details</TableHeaderCell>
-              <TableHeaderCell className="w-32">Student</TableHeaderCell>
-              <TableHeaderCell className="w-28">Status</TableHeaderCell>
-              <TableHeaderCell className="w-24 text-right">Actions</TableHeaderCell>
+            <TableRow className="border-b border-hairline bg-paper">
+              <TableHeaderCell className="w-36 font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                ID &amp; Date
+              </TableHeaderCell>
+              <TableHeaderCell className="w-44 font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                Category / Location
+              </TableHeaderCell>
+              <TableHeaderCell className="font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                Complaint Details
+              </TableHeaderCell>
+              <TableHeaderCell className="w-32 font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                Student
+              </TableHeaderCell>
+              <TableHeaderCell className="w-28 font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                Status
+              </TableHeaderCell>
+              <TableHeaderCell className="w-24 text-right font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
+                Actions
+              </TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {complaints.map((c) => (
-              <TableRow key={c.complaint_id}>
-                {/* ID & Date Combined */}
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <span className="font-mono text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200/60 w-fit">
-                      {c.complaint_id}
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-medium">
-                      {formatDate(c.submitted_at)}
-                    </span>
-                  </div>
-                </TableCell>
-
-                {/* Category & Location Combined */}
-                <TableCell>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-semibold text-slate-900 text-xs">{c.category}</span>
-                    <span className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                      <span className="truncate max-w-[150px]">{c.location}</span>
-                    </span>
-                  </div>
-                </TableCell>
-
-                {/* Complaint Title + Priority Badge */}
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <PriorityBadge priority={c.priority} />
-                      <p className="font-semibold text-slate-900 text-xs truncate max-w-xs" title={c.title}>
-                        {c.title}
-                      </p>
-                    </div>
-                    <p className="text-[11px] text-slate-500 line-clamp-1">{c.description}</p>
-                  </div>
-                </TableCell>
-
-                {/* Student Identity */}
-                <TableCell>
-                  {c.is_anonymous ? (
-                    <span className="inline-flex items-center text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                      Anonymous
-                    </span>
-                  ) : (
-                    <div className="flex flex-col text-xs">
-                      <span className="font-medium text-slate-900 truncate max-w-[120px]" title={c.student_name}>
-                        {c.student_name}
+            {complaints.map((c, index) => {
+              const isEven = index % 2 === 0;
+              return (
+                <TableRow
+                  key={c.complaint_id}
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('button, a')) return;
+                    navigate(`/admin/complaints/${c.complaint_id}`);
+                  }}
+                  className={`border-b border-hairline transition-colors duration-150 hover:bg-registrar-blue/5 cursor-pointer ${
+                    isEven ? 'bg-paper-card' : 'bg-paper/40'
+                  }`}
+                >
+                  {/* ID & Date (Mono ticket code style) */}
+                  <TableCell className="py-4">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-mono text-xs font-semibold text-ink-navy">
+                        {c.complaint_id}
                       </span>
-                      <span className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                        {c.student_id || c.department || ''}
+                      <span className="text-[11px] font-mono text-ink-muted">
+                        {formatDate(c.submitted_at)}
                       </span>
                     </div>
-                  )}
-                </TableCell>
+                  </TableCell>
 
-                {/* Status Badge */}
-                <TableCell>
-                  <ComplaintStatusBadge status={c.status} />
-                </TableCell>
+                  {/* Category & Location Combined */}
+                  <TableCell className="py-4">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-semibold text-ink-navy text-xs">{c.category}</span>
+                      <span className="text-[11px] text-ink-muted flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-ink-muted flex-shrink-0" />
+                        <span className="truncate max-w-[150px]">{c.location}</span>
+                      </span>
+                    </div>
+                  </TableCell>
 
-                {/* Action Buttons: View & Delete */}
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <Link
-                      to={`/admin/complaints/${c.complaint_id}`}
-                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition-colors"
-                      title="View Complaint Details"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>View</span>
-                    </Link>
+                  {/* Complaint Title + Priority Badge */}
+                  <TableCell className="py-4">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <PriorityBadge priority={c.priority} />
+                        <p className="font-semibold text-ink-navy text-xs truncate max-w-xs" title={c.title}>
+                          {c.title}
+                        </p>
+                      </div>
+                      <p className="text-[11px] text-ink-muted line-clamp-1">{c.description}</p>
+                    </div>
+                  </TableCell>
 
-                    <button
-                      type="button"
-                      onClick={() => setDeletingComplaint(c)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all"
-                      title="Delete Complaint"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                  {/* Student Identity */}
+                  <TableCell className="py-4">
+                    {c.is_anonymous ? (
+                      <Pill variant="neutral" size="sm" label="Anonymous" />
+                    ) : (
+                      <div className="flex flex-col text-xs">
+                        <span className="font-semibold text-ink-navy truncate max-w-[120px]" title={c.student_name}>
+                          {c.student_name}
+                        </span>
+                        <span className="text-[10px] font-mono text-ink-muted truncate max-w-[120px]">
+                          {c.student_id || c.department || ''}
+                        </span>
+                      </div>
+                    )}
+                  </TableCell>
+
+                  {/* Status Badge / Pill */}
+                  <TableCell className="py-4">
+                    <Pill
+                      variant={mapStatusToPillVariant(c.status) as any}
+                      size="sm"
+                      label={c.status}
+                    />
+                  </TableCell>
+
+                  {/* Action Buttons: View & Delete */}
+                  <TableCell className="text-right py-4">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <Link
+                        to={`/admin/complaints/${c.complaint_id}`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-registrar-blue hover:bg-registrar-blue/10 border border-registrar-blue/20 transition-colors"
+                        title="View Complaint Details"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View</span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingComplaint(c);
+                        }}
+                        className="p-1 rounded-lg text-ink-muted hover:text-case-red hover:bg-case-red/10 border border-transparent hover:border-case-red/20 transition-colors"
+                        title="Delete Complaint"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

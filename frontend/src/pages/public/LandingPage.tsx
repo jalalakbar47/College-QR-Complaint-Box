@@ -6,7 +6,6 @@ import {
   Search,
   Lock,
   HeartHandshake,
-  QrCode,
   CheckCircle2,
   ArrowRight,
   BookOpen,
@@ -21,27 +20,38 @@ import {
   UserX,
   FileCheck,
   ChevronRight,
+  Copy,
+  Download,
+  Check,
+  ExternalLink,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/Button';
-import { QRDisplay } from '../../components/qr/QRDisplay';
+import { Pill } from '../../components/ui/Pill';
+import { TicketStub } from '../../components/ui/TicketStub';
+import { SectionEyebrow } from '../../components/ui/SectionEyebrow';
+import { useToast } from '../../contexts/ToastContext';
 import { ENV } from '../../config/env';
 
 const CATEGORY_SHOWCASE = [
-  { name: 'Academic & Lectures', icon: BookOpen, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  { name: 'Examination & Grades', icon: GraduationCap, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-  { name: 'Harassment & Safety', icon: ShieldAlert, color: 'text-rose-600 bg-rose-50 border-rose-200' },
-  { name: 'Anti-Bullying & Ragging', icon: UserX, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-  { name: 'Infrastructure & Labs', icon: Building, color: 'text-cyan-600 bg-cyan-50 border-cyan-200' },
-  { name: 'Electricity & Backup', icon: Zap, color: 'text-amber-500 bg-amber-50 border-amber-200' },
-  { name: 'Cleanliness & Hygiene', icon: Sparkles, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-  { name: 'Drinking Water & Restrooms', icon: Droplets, color: 'text-sky-600 bg-sky-50 border-sky-200' },
-  { name: 'Campus Wi-Fi & IT Labs', icon: Wifi, color: 'text-purple-600 bg-purple-50 border-purple-200' },
-  { name: 'College Transport Buses', icon: Bus, color: 'text-orange-600 bg-orange-50 border-orange-200' },
+  { name: 'Academic & Lectures', icon: BookOpen },
+  { name: 'Examination & Grades', icon: GraduationCap },
+  { name: 'Harassment & Safety', icon: ShieldAlert },
+  { name: 'Anti-Bullying & Ragging', icon: UserX },
+  { name: 'Infrastructure & Labs', icon: Building },
+  { name: 'Electricity & Backup', icon: Zap },
+  { name: 'Cleanliness & Hygiene', icon: Sparkles },
+  { name: 'Drinking Water & Restrooms', icon: Droplets },
+  { name: 'Campus Wi-Fi & IT Labs', icon: Wifi },
+  { name: 'College Transport Buses', icon: Bus },
 ];
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { success } = useToast();
   const [quickTrackId, setQuickTrackId] = useState('');
+  const [copied, setCopied] = useState(false);
+  const qrRef = React.useRef<HTMLDivElement>(null);
 
   const portalComplaintUrl =
     typeof window !== 'undefined'
@@ -55,48 +65,71 @@ export const LandingPage: React.FC = () => {
     }
   };
 
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(portalComplaintUrl);
+    setCopied(true);
+    success('Complaint portal link copied to clipboard!');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadQr = () => {
+    const svg = qrRef.current?.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = 600;
+      canvas.height = 600;
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const pngFile = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = `gpgc-khar-complaint-qr-${Date.now()}.png`;
+        downloadLink.href = pngFile;
+        downloadLink.click();
+      }
+    };
+    img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
+  };
+
   return (
     <div className="space-y-16 sm:space-y-24 pb-20 overflow-hidden">
-      {/* 1. Hero Section with Gradient Mesh & Glow */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-brand-950 text-white pt-16 pb-20 sm:pt-24 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        {/* Subtle decorative grid background */}
-        <div className="absolute inset-0 bg-grid-white opacity-40 pointer-events-none" />
+      {/* 1. Hero Section (ink-navy background, full-bleed, restrained dot grid) */}
+      <section className="relative overflow-hidden bg-ink-navy text-white pt-14 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-ink-navy">
+        {/* Subtle fine dot-grid texture at low opacity */}
+        <div className="absolute inset-0 bg-dots-pattern opacity-10 pointer-events-none" />
 
-        {/* Ambient radial blur orbs */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-brand-500/15 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
-        <div className="absolute top-3/4 left-1/4 w-[350px] h-[350px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto text-center space-y-7 z-10">
-          {/* Institutional Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-brand-500/30 text-brand-300 text-xs font-bold tracking-wide shadow-lg backdrop-blur-md animate-fade-in">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
-            </span>
-            <ShieldCheck className="w-3.5 h-3.5 text-brand-400" />
-            <span>{ENV.COLLEGE_NAME}</span>
+        <div className="relative max-w-5xl mx-auto text-center space-y-6 z-10">
+          {/* Institution Eyebrow Pill on Dark Background */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs animate-fade-in">
+            <ShieldCheck className="w-3.5 h-3.5 text-seal-gold flex-shrink-0" />
+            <span className="truncate">{ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}</span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] font-display">
-            Fast, Confidential & Accountable <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 via-sky-200 to-indigo-300">
-              Campus Issue Reporting
-            </span>
+          {/* H1 in Fraunces */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white leading-[1.14] font-serif max-w-4xl mx-auto">
+            Fast, Confidential &amp; Accountable <br className="hidden sm:inline" />
+            <span className="text-seal-gold font-medium">Campus Issue Reporting</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-            Empowering students with a direct, friction-free channel to the <strong className="text-white font-semibold">Chief Proctor Office</strong>. Submit academic, infrastructure, or safety grievances with guaranteed confidentiality and real-time resolution tracking.
+          {/* Supporting Paragraph */}
+          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+            Empowering students with a direct, confidential channel to the <strong className="text-white font-medium">Chief Proctor Office</strong>. Submit academic, infrastructure, or safety concerns with guaranteed privacy and live resolution tracking.
           </p>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link to="/complaint" className="w-full sm:w-auto">
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-600 shadow-glow text-white text-sm sm:text-base font-bold py-4 px-8 rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto font-medium py-3.5 px-6"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
                 Submit a Complaint
@@ -105,239 +138,295 @@ export const LandingPage: React.FC = () => {
 
             <Link to="/track" className="w-full sm:w-auto">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="lg"
-                className="w-full sm:w-auto text-white border-slate-700 bg-slate-800/60 hover:bg-slate-800 hover:border-slate-600 text-sm sm:text-base py-4 px-8 rounded-2xl backdrop-blur-xs transition-all duration-200"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border-white/30 backdrop-blur-xs font-medium py-3.5 px-6"
                 leftIcon={<Search className="w-5 h-5 text-slate-300" />}
               >
                 Track Existing Complaint
               </Button>
             </Link>
           </div>
+        </div>
+      </section>
 
-          {/* Trust Guarantees */}
-          <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-left max-w-4xl mx-auto">
-            <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xs flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div className="text-xs">
-                <span className="font-bold text-white block">100% Anonymous</span>
-                <span className="text-[11px] text-slate-400">Zero identity logs</span>
-              </div>
+      {/* 2. Trust Strip (4 items, floating card row overlapping hero) */}
+      <section className="-mt-10 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 relative z-20">
+        <div className="bg-paper-card rounded-xl border border-hairline shadow-md p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 p-2">
+            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="w-4 h-4 text-ledger-green" />
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xs flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 flex-shrink-0">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <div className="text-xs">
-                <span className="font-bold text-white block">Chief Proctor</span>
-                <span className="text-[11px] text-slate-400">Direct supervision</span>
-              </div>
+            <div className="min-w-0">
+              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">100% Anonymous</span>
+              <span className="text-[11px] text-ink-muted block truncate">Zero identity logs</span>
             </div>
+          </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xs flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 flex-shrink-0">
-                <FileCheck className="w-4 h-4" />
-              </div>
-              <div className="text-xs">
-                <span className="font-bold text-white block">Unique CQB ID</span>
-                <span className="text-[11px] text-slate-400">Instant tracking code</span>
-              </div>
+          <div className="flex items-center gap-3 p-2">
+            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
+              <ShieldCheck className="w-4 h-4 text-seal-gold" />
             </div>
+            <div className="min-w-0">
+              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Chief Proctor</span>
+              <span className="text-[11px] text-ink-muted block truncate">Direct supervision</span>
+            </div>
+          </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xs flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                <Zap className="w-4 h-4" />
-              </div>
-              <div className="text-xs">
-                <span className="font-bold text-white block">Swift Redressal</span>
-                <span className="text-[11px] text-slate-400">Fast action cycle</span>
-              </div>
+          <div className="flex items-center gap-3 p-2">
+            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
+              <FileCheck className="w-4 h-4 text-registrar-blue" />
+            </div>
+            <div className="min-w-0">
+              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Unique CQB ID</span>
+              <span className="text-[11px] text-ink-muted block truncate">Instant tracking code</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-2">
+            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
+              <Zap className="w-4 h-4 text-seal-gold" />
+            </div>
+            <div className="min-w-0">
+              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Swift Redressal</span>
+              <span className="text-[11px] text-ink-muted block truncate">Fast action cycle</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Quick Track Interactive Bar */}
-      <section className="-mt-10 sm:-mt-14 max-w-4xl mx-auto px-4 sm:px-6 relative z-20">
-        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-elevated">
+      {/* 3. Quick Track Bar */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
           <form onSubmit={handleQuickTrack} className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="flex items-center gap-2 text-slate-700 font-bold text-xs uppercase tracking-wider pl-2 flex-shrink-0">
-              <Search className="w-4 h-4 text-brand-600" />
+            <div className="flex items-center gap-1.5 text-ink-navy font-mono text-xs font-medium uppercase tracking-wider pl-1 flex-shrink-0">
+              <Search className="w-4 h-4 text-registrar-blue" />
               <span>Quick Track:</span>
             </div>
 
             <div className="relative flex-1 w-full">
               <input
                 type="text"
-                placeholder="Enter Ticket ID (e.g. CQB-20260818-A7F2)..."
+                placeholder="e.g. CQB-20260818-A7F2"
                 value={quickTrackId}
                 onChange={(e) => setQuickTrackId(e.target.value)}
-                className="w-full text-xs sm:text-sm font-mono font-bold px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/70 text-slate-900 placeholder:text-slate-400 placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 uppercase tracking-wider"
+                className="w-full text-xs sm:text-sm font-mono font-medium px-3.5 py-2.5 rounded-lg border border-hairline bg-paper text-ink-navy placeholder:text-ink-muted placeholder:font-mono focus:outline-none focus:ring-2 focus:ring-registrar-blue uppercase tracking-wide min-h-[44px]"
               />
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 flex-shrink-0 shadow-sm"
+              variant="primary"
+              size="md"
+              className="w-full sm:w-auto px-5"
+              rightIcon={<ArrowRight className="w-4 h-4" />}
             >
-              <span>Track Ticket</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              Track Ticket
+            </Button>
           </form>
         </div>
       </section>
 
-      {/* 3. Main Workflow & Interactive QR Placard Studio */}
+      {/* 4. Main Workflow & TicketStub QR Placard Studio */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Left 7 Columns: Step by step journey */}
+          {/* Left Column (7 cols): Step by Step Journey */}
           <div className="lg:col-span-7 space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-extrabold border border-brand-200/80 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-                <span>Transparent Process</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+            <div className="animate-fade-up space-y-2">
+              <SectionEyebrow rulePosition="left">TRANSPARENT PROCESS</SectionEyebrow>
+              <h2 className="text-2xl sm:text-4xl font-normal text-ink-navy tracking-tight font-serif">
                 How the QR Complaint Box Works
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
                 Designed to make student complaint filing frictionless, safe, and quickly actionable by campus administration.
               </p>
             </div>
 
-            <div className="space-y-4 pt-2">
+            {/* Stepper with hairline connector */}
+            <div className="relative space-y-4 pt-1">
               {/* Step 1 */}
-              <div className="group flex items-start gap-4 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-subtle hover:shadow-card hover:border-brand-300 transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
+              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
                   1
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">Scan Campus QR Code</h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Scan Campus QR Code</h3>
+                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
                     Look for official QR code placards installed across lecture halls, labs, hostels, cafeteria, and college entrance gates.
                   </p>
                 </div>
               </div>
 
               {/* Step 2 */}
-              <div className="group flex items-start gap-4 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-subtle hover:shadow-card hover:border-brand-300 transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-700 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
                   2
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">Select Category & Describe Issue</h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Select Category &amp; Describe Issue</h3>
+                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
                     Choose the issue type (academic, infrastructure, hygiene, ragging, harassment, electricity, etc.) and describe what happened clearly.
                   </p>
                 </div>
               </div>
 
               {/* Step 3 */}
-              <div className="group flex items-start gap-4 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-subtle hover:shadow-card hover:border-brand-300 transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform">
+              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
                   3
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">Submit Anonymously or with Info</h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Submit Anonymously or with Info</h3>
+                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
                     Choose whether you wish to submit your student ID or submit 100% anonymously. Receive a unique Reference ID instantly.
                   </p>
                 </div>
               </div>
 
               {/* Step 4 */}
-              <div className="group flex items-start gap-4 p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-subtle hover:shadow-card hover:border-brand-300 transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-emerald-700 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
                   4
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg">Track Status & Proctor Resolution</h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Track Status &amp; Proctor Resolution</h3>
+                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
                     Use your Reference ID to check live updates as the Proctor reviews, assigns, and resolves your complaint.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Proctor Privacy Guarantee Banner */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 shadow-subtle flex items-start gap-4">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-600/20">
-                <HeartHandshake className="w-6 h-6" />
+            {/* Proctor Privacy Guarantee Callout Box */}
+            <div className="p-5 sm:p-6 rounded-xl bg-ledger-green/10 border border-ledger-green/20 shadow-sm flex items-start gap-4">
+              <div className="w-9 h-9 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0">
+                <HeartHandshake className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-extrabold text-emerald-950 text-base">Proctor Privacy Guarantee</h4>
-                <p className="text-xs sm:text-sm text-emerald-800 mt-1 leading-relaxed">
+                <h4 className="font-semibold text-ink-navy text-sm sm:text-base">Proctor Privacy Guarantee</h4>
+                <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
                   Your safety and academic freedom are our highest priority. When "Anonymous" is selected, zero student identifiers are recorded in Google Sheets or backend logs.
                 </p>
               </div>
             </div>
+
+            {/* Admin Portal Access Link Row */}
+            <Link
+              to="/admin/login"
+              className="flex items-center justify-between p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-sm text-ink-navy text-xs sm:text-sm font-medium transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-paper border border-hairline flex items-center justify-center text-ink-navy">
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+                <span>Chief Proctor / Admin Portal Access</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-ink-muted" />
+            </Link>
           </div>
 
-          {/* Right 5 Columns: QR Code Station Preview */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Right Column (5 cols): Sticky TicketStub QR Placard */}
+          <div className="lg:col-span-5">
             <div className="sticky top-24">
-              <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-card">
-                <div className="text-center mb-5">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-extrabold border border-brand-200/80 mb-2">
-                    <QrCode className="w-3.5 h-3.5 text-brand-600" />
-                    <span>Campus QR Placard</span>
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 font-display">
-                    Direct Mobile Submission
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Scan or share this code with students across campus
-                  </p>
-                </div>
-
-                <QRDisplay url={portalComplaintUrl} size={190} showActions={true} />
-
-                <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col gap-2.5">
-                  <Link
-                    to="/admin/login"
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-bold transition-colors border border-slate-200/60"
+              <TicketStub
+                eyebrow="CAMPUS QR PLACARD"
+                referenceId="Direct Mobile Submission"
+                statusPill={<Pill variant="new" size="sm" label="Scan to Submit" />}
+              >
+                <div className="flex flex-col items-center text-center">
+                  {/* QR Code Container */}
+                  <div
+                    ref={qrRef}
+                    className="p-3 bg-white rounded-lg border border-hairline shadow-sm mb-3 flex items-center justify-center"
                   >
-                    <Lock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Chief Proctor / Admin Portal Access</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                  </Link>
+                    <QRCodeSVG
+                      value={portalComplaintUrl}
+                      size={180}
+                      level="H"
+                      includeMargin={false}
+                    />
+                  </div>
+
+                  <h4 className="font-semibold text-ink-navy text-sm sm:text-base">
+                    Scan to Submit Complaint
+                  </h4>
+                  <p className="text-xs text-ink-muted max-w-xs mt-0.5 leading-relaxed">
+                    Point your smartphone camera to instantly open the confidential form
+                  </p>
+
+                  {/* Target URL Chip */}
+                  <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper border border-hairline text-xs text-ink-muted font-mono my-3.5">
+                    <span className="truncate pr-2">{portalComplaintUrl}</span>
+                    <a
+                      href={portalComplaintUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-registrar-blue hover:text-registrar-blue/80 p-1 flex-shrink-0"
+                      title="Open in new tab"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 w-full">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={handleCopyUrl}
+                      leftIcon={
+                        copied ? (
+                          <Check className="w-3.5 h-3.5 text-ledger-green" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )
+                      }
+                    >
+                      {copied ? 'Copied' : 'Copy URL'}
+                    </Button>
+
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={handleDownloadQr}
+                      leftIcon={<Download className="w-3.5 h-3.5" />}
+                    >
+                      Download PNG
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              </TicketStub>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. Supported Campus Issue Categories Showcase */}
+      {/* 5. Supported Complaint Categories Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-extrabold border border-indigo-200/80 mb-2">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Comprehensive Redressal</span>
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2 animate-fade-up">
+          <SectionEyebrow rulePosition="both">COMPREHENSIVE REDRESSAL</SectionEyebrow>
+          <h2 className="text-2xl sm:text-4xl font-normal text-ink-navy tracking-tight font-serif">
             Supported Complaint Categories
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-2">
+          <p className="text-xs sm:text-sm text-ink-muted">
             The Chief Proctor Office handles all campus concerns with dedicated department liaisons.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {CATEGORY_SHOWCASE.map((cat, idx) => {
             const Icon = cat.icon;
             return (
               <div
                 key={idx}
-                className="group p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-card hover:border-brand-300 transition-all duration-200 flex flex-col items-center text-center gap-2.5"
+                className="group p-4 rounded-xl bg-paper-card border border-hairline shadow-sm hover:shadow-md hover:border-registrar-blue transition-all duration-150 flex flex-col items-center text-center gap-3 cursor-default"
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${cat.color} group-hover:scale-110 transition-transform`}>
+                <div className="w-10 h-10 rounded-lg bg-paper border border-hairline text-registrar-blue flex items-center justify-center group-hover:bg-registrar-blue/10 transition-colors">
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-slate-800 leading-tight">
+                <span className="text-xs sm:text-sm font-medium text-ink-navy group-hover:text-registrar-blue transition-colors leading-tight">
                   {cat.name}
                 </span>
               </div>
@@ -346,12 +435,12 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Direct Action Callout Card */}
+      {/* 6. CTA Banner (ink-navy, rounded-2xl, contained) */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-brand-950 to-slate-900 text-white p-8 sm:p-12 shadow-elevated border border-slate-800">
+        <div className="rounded-2xl bg-ink-navy text-white p-6 sm:p-10 border border-ink-navy shadow-md relative overflow-hidden">
           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
             <div className="space-y-2 max-w-xl">
-              <h3 className="text-xl sm:text-3xl font-extrabold text-white font-display">
+              <h3 className="text-xl sm:text-3xl font-normal text-white font-serif">
                 Have an Issue on Campus Today?
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -359,11 +448,11 @@ export const LandingPage: React.FC = () => {
               </p>
             </div>
 
-            <Link to="/complaint" className="flex-shrink-0">
+            <Link to="/complaint" className="flex-shrink-0 w-full sm:w-auto">
               <Button
                 variant="primary"
                 size="lg"
-                className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-3.5 px-8 rounded-2xl shadow-glow transition-all"
+                className="w-full sm:w-auto font-medium py-3 px-6"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
                 Submit Complaint Now

@@ -78,30 +78,33 @@ export const AdminComplaintsPage: React.FC = () => {
   const paginatedComplaints = complaints.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Complaints Repository</h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <h2 className="font-serif text-xl sm:text-2xl font-normal text-ink-navy tracking-tight">
+            Complaint Records Repository
+          </h2>
+          <p className="text-xs sm:text-sm text-ink-muted mt-0.5">
             View, search, and manage all student complaints submitted to the Proctor Office.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={refetch}
             disabled={isLoading}
             leftIcon={<RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />}
+            className="text-xs"
           >
             Refresh
           </Button>
         </div>
       </div>
 
-      {/* Filter Component */}
+      {/* Filter & Search Card */}
       <ComplaintFilter
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -123,11 +126,18 @@ export const AdminComplaintsPage: React.FC = () => {
         />
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 px-1">
-            <span>Showing {paginatedComplaints.length} of {totalItems} complaints</span>
+          <div className="flex items-center justify-between font-mono text-xs text-ink-muted px-1">
+            <span>
+              Showing <strong className="text-ink-navy">{paginatedComplaints.length}</strong> of{' '}
+              <strong className="text-ink-navy">{totalItems}</strong> complaints
+            </span>
           </div>
 
-          <ComplaintTable complaints={paginatedComplaints} isLoading={isLoading} />
+          <ComplaintTable
+            complaints={paginatedComplaints}
+            isLoading={isLoading}
+            onDeleted={refetch}
+          />
 
           <Pagination
             currentPage={currentPage}
