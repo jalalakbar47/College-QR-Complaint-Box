@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
                 size="sm"
                 label={ENV.IS_LIVE_API_CONFIGURED ? 'Live Cloud Database' : 'Active Local Engine'}
               />
-              <span className="font-mono text-[10px] text-ink-muted">v2.0.0</span>
+              <span className="font-mono text-[10px] text-ink-muted">v2.1.0</span>
             </div>
           </div>
 

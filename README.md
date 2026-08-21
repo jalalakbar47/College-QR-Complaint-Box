@@ -1,4 +1,4 @@
-# 🏛️ College QR Complaint Box — v2.0.0
+# 🏛️ College QR Complaint Box — v2.1.0
 
 [![React 18](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -14,7 +14,7 @@ Students scan QR code placards placed across campus (Lecture Halls, IT Labs, Hos
 
 ---
 
-## 🌟 What's New in Version 2.0.0
+## 🌟 What's New in Version 2.1.0
 
 - 🏛️ **3-Level Surface Elevation Design System**:
   - **Level 0 Canvas** (`#EAEDF3`): High-end paper canvas providing distinct visual depth.

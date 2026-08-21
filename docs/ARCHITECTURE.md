@@ -1,6 +1,6 @@
-# 🏛️ System Architecture — College QR Complaint Box v2.0.0
+# 🏛️ System Architecture — College QR Complaint Box v2.1.0
 
-This document outlines the end-to-end architecture, design system specifications, data flows, and security model of the **College QR Complaint Box System** (v2.0.0).
+This document outlines the end-to-end architecture, design system specifications, data flows, and security model of the **College QR Complaint Box System** (v2.1.0).
 
 ---
 
