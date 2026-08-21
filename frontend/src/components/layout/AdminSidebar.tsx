@@ -47,6 +47,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-ink-navy text-white flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 border-r border-ink-navy/80 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ backgroundColor: '#101B36' }}
       >
         {/* Brand Header */}
         <div className="h-16 sm:h-20 px-5 flex items-center justify-between border-b border-white/10">

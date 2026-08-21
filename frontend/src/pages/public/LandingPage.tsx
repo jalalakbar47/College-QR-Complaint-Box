@@ -99,11 +99,22 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 sm:space-y-24 pb-20 overflow-hidden">
-      {/* 1. Hero Section (ink-navy background, full-bleed, restrained dot grid) */}
-      <section className="relative overflow-hidden bg-ink-navy text-white pt-14 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-ink-navy">
-        {/* Subtle fine dot-grid texture at low opacity */}
-        <div className="absolute inset-0 bg-dots-pattern opacity-10 pointer-events-none" />
+    <div className="space-y-12 sm:space-y-16 pb-20 overflow-hidden bg-paper">
+      {/* 1. Hero Section (ink-navy background with campus photo, full-bleed, restrained dot grid) */}
+      <section
+        className="relative overflow-hidden bg-ink-navy text-white pt-14 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-ink-navy"
+        style={{ backgroundColor: '#101B36' }}
+      >
+        {/* Campus Background Image with Increased Opacity & Balanced ink-navy Overlay */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img
+            src="/background.jpeg"
+            alt="GPGC Khar District Bajaur Campus Background"
+            className="w-full h-full object-cover object-center opacity-55 scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-ink-navy/75 via-ink-navy/65 to-ink-navy/95" />
+          <div className="absolute inset-0 bg-dots-pattern opacity-5" />
+        </div>
 
         <div className="relative max-w-5xl mx-auto text-center space-y-6 z-10">
           {/* Institution Eyebrow Pill on Dark Background */}
@@ -129,7 +140,7 @@ export const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full sm:w-auto font-medium py-3.5 px-6"
+                className="w-full sm:w-auto font-medium py-3.5 px-6 shadow-sm"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
                 Submit a Complaint
@@ -152,43 +163,43 @@ export const LandingPage: React.FC = () => {
 
       {/* 2. Trust Strip (4 items, floating card row overlapping hero) */}
       <section className="-mt-10 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 relative z-20">
-        <div className="bg-paper-card rounded-xl border border-hairline shadow-md p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <div className="flex items-center gap-3 p-2">
+        <div className="bg-paper-card rounded-xl border border-hairline shadow-sm p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
             <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
               <CheckCircle2 className="w-4 h-4 text-ledger-green" />
             </div>
             <div className="min-w-0">
-              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">100% Anonymous</span>
+              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">100% Anonymous</span>
               <span className="text-[11px] text-ink-muted block truncate">Zero identity logs</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
             <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-4 h-4 text-seal-gold" />
             </div>
             <div className="min-w-0">
-              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Chief Proctor</span>
+              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Chief Proctor</span>
               <span className="text-[11px] text-ink-muted block truncate">Direct supervision</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
             <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
               <FileCheck className="w-4 h-4 text-registrar-blue" />
             </div>
             <div className="min-w-0">
-              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Unique CQB ID</span>
+              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Unique CQB ID</span>
               <span className="text-[11px] text-ink-muted block truncate">Instant tracking code</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
             <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
               <Zap className="w-4 h-4 text-seal-gold" />
             </div>
             <div className="min-w-0">
-              <span className="font-medium text-ink-navy text-xs sm:text-sm block truncate">Swift Redressal</span>
+              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Swift Redressal</span>
               <span className="text-[11px] text-ink-muted block truncate">Fast action cycle</span>
             </div>
           </div>
@@ -199,7 +210,7 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-3xl mx-auto px-4 sm:px-6">
         <div className="p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
           <form onSubmit={handleQuickTrack} className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="flex items-center gap-1.5 text-ink-navy font-mono text-xs font-medium uppercase tracking-wider pl-1 flex-shrink-0">
+            <div className="flex items-center gap-1.5 text-ink-navy font-mono text-xs font-semibold uppercase tracking-wider pl-1 flex-shrink-0">
               <Search className="w-4 h-4 text-registrar-blue" />
               <span>Quick Track:</span>
             </div>
@@ -210,7 +221,7 @@ export const LandingPage: React.FC = () => {
                 placeholder="e.g. CQB-20260818-A7F2"
                 value={quickTrackId}
                 onChange={(e) => setQuickTrackId(e.target.value)}
-                className="w-full text-xs sm:text-sm font-mono font-medium px-3.5 py-2.5 rounded-lg border border-hairline bg-paper text-ink-navy placeholder:text-ink-muted placeholder:font-mono focus:outline-none focus:ring-2 focus:ring-registrar-blue uppercase tracking-wide min-h-[44px]"
+                className="w-full text-xs sm:text-sm font-mono font-medium px-3.5 py-2.5 rounded-lg border border-hairline bg-paper-recessed text-ink-navy placeholder:text-ink-muted placeholder:font-mono focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:bg-paper-card uppercase tracking-wide min-h-[44px] transition-colors"
               />
             </div>
 
@@ -218,7 +229,7 @@ export const LandingPage: React.FC = () => {
               type="submit"
               variant="primary"
               size="md"
-              className="w-full sm:w-auto px-5"
+              className="w-full sm:w-auto px-5 shadow-sm"
               rightIcon={<ArrowRight className="w-4 h-4" />}
             >
               Track Ticket
@@ -242,7 +253,7 @@ export const LandingPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Stepper with hairline connector */}
+            {/* Stepper Cards */}
             <div className="relative space-y-4 pt-1">
               {/* Step 1 */}
               <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
@@ -299,12 +310,12 @@ export const LandingPage: React.FC = () => {
 
             {/* Proctor Privacy Guarantee Callout Box */}
             <div className="p-5 sm:p-6 rounded-xl bg-ledger-green/10 border border-ledger-green/20 shadow-sm flex items-start gap-4">
-              <div className="w-9 h-9 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                 <HeartHandshake className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="font-semibold text-ink-navy text-sm sm:text-base">Proctor Privacy Guarantee</h4>
-                <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
+                <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed font-sans">
                   Your safety and academic freedom are our highest priority. When "Anonymous" is selected, zero student identifiers are recorded in Google Sheets or backend logs.
                 </p>
               </div>
@@ -313,10 +324,10 @@ export const LandingPage: React.FC = () => {
             {/* Admin Portal Access Link Row */}
             <Link
               to="/admin/login"
-              className="flex items-center justify-between p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-sm text-ink-navy text-xs sm:text-sm font-medium transition-colors"
+              className="flex items-center justify-between p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md text-ink-navy text-xs sm:text-sm font-medium transition-all shadow-sm"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-paper border border-hairline flex items-center justify-center text-ink-navy">
+                <div className="w-7 h-7 rounded-lg bg-paper-recessed border border-hairline flex items-center justify-center text-ink-navy">
                   <Lock className="w-3.5 h-3.5" />
                 </div>
                 <span>Chief Proctor / Admin Portal Access</span>
@@ -350,12 +361,12 @@ export const LandingPage: React.FC = () => {
                   <h4 className="font-semibold text-ink-navy text-sm sm:text-base">
                     Scan to Submit Complaint
                   </h4>
-                  <p className="text-xs text-ink-muted max-w-xs mt-0.5 leading-relaxed">
+                  <p className="text-xs text-ink-muted max-w-xs mt-0.5 leading-relaxed font-sans">
                     Point your smartphone camera to instantly open the confidential form
                   </p>
 
                   {/* Target URL Chip */}
-                  <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper border border-hairline text-xs text-ink-muted font-mono my-3.5">
+                  <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper-recessed border border-hairline text-xs text-ink-muted font-mono my-3.5">
                     <span className="truncate pr-2">{portalComplaintUrl}</span>
                     <a
                       href={portalComplaintUrl}
@@ -389,7 +400,7 @@ export const LandingPage: React.FC = () => {
                     <Button
                       variant="primary"
                       size="sm"
-                      className="flex-1 text-xs"
+                      className="flex-1 text-xs shadow-sm"
                       onClick={handleDownloadQr}
                       leftIcon={<Download className="w-3.5 h-3.5" />}
                     >
@@ -410,7 +421,7 @@ export const LandingPage: React.FC = () => {
           <h2 className="text-2xl sm:text-4xl font-normal text-ink-navy tracking-tight font-serif">
             Supported Complaint Categories
           </h2>
-          <p className="text-xs sm:text-sm text-ink-muted">
+          <p className="text-xs sm:text-sm text-ink-muted font-sans">
             The Chief Proctor Office handles all campus concerns with dedicated department liaisons.
           </p>
         </div>
@@ -423,10 +434,10 @@ export const LandingPage: React.FC = () => {
                 key={idx}
                 className="group p-4 rounded-xl bg-paper-card border border-hairline shadow-sm hover:shadow-md hover:border-registrar-blue transition-all duration-150 flex flex-col items-center text-center gap-3 cursor-default"
               >
-                <div className="w-10 h-10 rounded-lg bg-paper border border-hairline text-registrar-blue flex items-center justify-center group-hover:bg-registrar-blue/10 transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-paper-recessed border border-hairline text-registrar-blue flex items-center justify-center group-hover:bg-registrar-blue/10 transition-colors">
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-ink-navy group-hover:text-registrar-blue transition-colors leading-tight">
+                <span className="text-xs sm:text-sm font-semibold text-ink-navy group-hover:text-registrar-blue transition-colors leading-tight">
                   {cat.name}
                 </span>
               </div>
@@ -435,15 +446,18 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. CTA Banner (ink-navy, rounded-2xl, contained) */}
+      {/* 6. CTA Banner (ink-navy-card, rounded-2xl, contained) */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="rounded-2xl bg-ink-navy text-white p-6 sm:p-10 border border-ink-navy shadow-md relative overflow-hidden">
+        <div
+          className="rounded-2xl bg-ink-navy-card text-white p-6 sm:p-10 border border-white/10 shadow-md relative overflow-hidden"
+          style={{ backgroundColor: '#16234A' }}
+        >
           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
             <div className="space-y-2 max-w-xl">
               <h3 className="text-xl sm:text-3xl font-normal text-white font-serif">
                 Have an Issue on Campus Today?
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
                 Don't hesitate. Your feedback drives positive campus change. Report directly to the Chief Proctor in less than 60 seconds.
               </p>
             </div>
@@ -452,7 +466,7 @@ export const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full sm:w-auto font-medium py-3 px-6"
+                className="w-full sm:w-auto font-medium py-3 px-6 shadow-sm"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
                 Submit Complaint Now

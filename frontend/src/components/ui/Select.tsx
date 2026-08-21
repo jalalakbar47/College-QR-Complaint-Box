@@ -46,11 +46,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             id={selectId}
             ref={ref}
-            className={`block w-full appearance-none rounded-lg border bg-paper-card text-ink-navy text-sm px-3.5 py-2.5 pr-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed cursor-pointer min-h-[44px] ${
-              error
+            className={`block w-full appearance-none rounded-lg border bg-paper-card text-ink-navy text-sm px-3.5 py-2.5 pr-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed cursor-pointer min-h-[44px] ${error
                 ? 'border-case-red/50 focus:border-case-red focus:ring-case-red/20 text-case-red bg-case-red/5'
                 : 'border-hairline hover:border-ink-muted/40'
-            } ${className}`}
+              } ${className}`}
             {...props}
           >
             {placeholder && (

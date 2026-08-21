@@ -53,7 +53,10 @@ export const AdminDashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* 1. Welcome Banner */}
-      <div className="bg-ink-navy rounded-2xl p-6 sm:p-7 text-white relative overflow-hidden border border-ink-navy shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div
+        className="bg-ink-navy rounded-2xl p-6 sm:p-7 text-white relative overflow-hidden border border-ink-navy shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+        style={{ backgroundColor: '#101B36' }}
+      >
         {/* Subtle dot grid */}
         <div className="absolute inset-0 bg-dots-pattern opacity-10 pointer-events-none" />
 

@@ -53,12 +53,15 @@ export interface Category {
   category_id: string;
   category_name: string;
   description?: string;
+  department_liaison?: string;
+  icon_name?: string;
   status: 'Active' | 'Inactive';
 }
 
 export interface LocationItem {
   location_id: string;
   location_name: string;
+  building_block?: string;
   status: 'Active' | 'Inactive';
 }
 

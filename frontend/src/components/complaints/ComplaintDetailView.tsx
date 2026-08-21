@@ -1,62 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-  ShieldAlert,
-  User,
+  Tag,
   MapPin,
+  Check,
   Clock,
-  Save,
-  Building,
-  Phone,
   CheckCircle2,
   AlertTriangle,
-  Copy,
-  Check,
+  User,
+  Phone,
+  GraduationCap,
+  Building,
+  Save,
+  Trash2,
   Printer,
   Sparkles,
-  ArrowRight,
-  Tag,
-  GraduationCap,
-  MessageSquareQuote,
-  Flame,
   Zap,
-  Trash2,
+  Flame,
+  ArrowRight,
+  Copy,
+  MessageSquareQuote,
+  ShieldAlert,
   Edit3,
 } from 'lucide-react';
 import { Admin, Complaint, ComplaintPriority, ComplaintStatus, UpdateComplaintDTO } from '../../types';
 import { Pill } from '../ui/Pill';
-import { Card, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Card, CardHeader } from '../ui/Card';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { formatDateTime } from '../../utils/dateFormatter';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { apiService } from '../../services/api';
 
 export interface ComplaintDetailViewProps {
   complaint: Complaint;
   admins?: Admin[];
+  isUpdating?: boolean;
   onUpdate: (dto: UpdateComplaintDTO) => Promise<boolean>;
-  isUpdating: boolean;
+  onDelete?: (complaintId: string) => Promise<boolean>;
 }
 
 const RESOLUTION_TEMPLATES = [
-  'Inspected on-site; corrective maintenance completed successfully.',
-  'Work order issued to infrastructure department; repairs underway.',
-  'Referred to Department Head and Academic Committee for review.',
-  'Laboratory equipment serviced, tested, and restored to active use.',
-  'Administrative inquiry completed and appropriate measures taken.',
-  'Spoke directly with student and resolved complaint to satisfaction.',
+  'Inspected on-site; work order forwarded to campus maintenance.',
+  'Issue resolved and verified with department head.',
+  'Disciplinary inquiry conducted under Proctorial rules.',
+  'Equipment replaced and tested successfully.',
+  'Scheduled for routine semester maintenance.',
 ];
 
-const STATUS_STEPS: { status: ComplaintStatus; label: string; desc: string }[] = [
-  { status: 'New', label: 'Logged', desc: 'Ticket registered' },
-  { status: 'In Progress', label: 'In Progress', desc: 'Action underway' },
-  { status: 'Resolved', label: 'Resolved', desc: 'Solution deployed' },
+const STATUS_STEPS = [
+  { status: 'New', label: 'Logged' },
+  { status: 'In Progress', label: 'In Progress' },
+  { status: 'Resolved', label: 'Resolved' },
 ];
 
-function mapStatusToPillVariant(status: string) {
-  const s = status.toLowerCase();
+function mapPriorityToPillVariant(priority: ComplaintPriority) {
+  const p = priority?.toLowerCase();
+  if (p === 'critical') return 'critical';
+  if (p === 'high') return 'high';
+  if (p === 'medium') return 'medium';
+  if (p === 'low') return 'low';
+  return 'low';
+}
+
+function mapStatusToPillVariant(status: ComplaintStatus) {
+  const s = status?.toLowerCase();
   if (s === 'new') return 'new';
   if (s === 'in progress' || s === 'in-progress' || s === 'under review' || s === 'assigned') return 'in-progress';
   if (s === 'resolved') return 'resolved';
@@ -65,27 +73,13 @@ function mapStatusToPillVariant(status: string) {
   return 'new';
 }
 
-function mapPriorityToPillVariant(priority: string) {
-  switch (priority) {
-    case 'Critical':
-      return 'critical';
-    case 'High':
-      return 'in-progress';
-    case 'Medium':
-      return 'new';
-    case 'Low':
-    default:
-      return 'neutral';
-  }
-}
-
 export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
   complaint,
+  isUpdating: externalIsUpdating = false,
   onUpdate,
-  isUpdating,
+  onDelete,
 }) => {
   const { admin } = useAuth();
-  const navigate = useNavigate();
   const { success, error } = useToast();
 
   const [status, setStatus] = useState<ComplaintStatus>(complaint.status);
@@ -93,11 +87,12 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
   const [resolutionNote, setResolutionNote] = useState<string>(
     complaint.resolution || complaint.admin_remarks || ''
   );
-  const [copiedId, setCopiedId] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [localIsUpdating, setLocalIsUpdating] = useState<boolean>(false);
+  const isUpdating = externalIsUpdating || localIsUpdating;
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [copiedId, setCopiedId] = useState<boolean>(false);
 
-  // Sync state if complaint prop updates from background
   useEffect(() => {
     setStatus(complaint.status);
     setPriority(complaint.priority);
@@ -107,6 +102,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
   const handleCopyId = () => {
     navigator.clipboard.writeText(complaint.complaint_id);
     setCopiedId(true);
+    success('Complaint Reference ID copied to clipboard!');
     setTimeout(() => setCopiedId(false), 2000);
   };
 
@@ -114,34 +110,29 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
     window.print();
   };
 
-  const handleDeleteComplaint = async () => {
-    setIsDeleting(true);
-    try {
-      const res = await apiService.deleteComplaint(
-        complaint.complaint_id,
-        undefined,
-        admin?.admin_id,
-        'Permanently deleted by Chief Proctor from Detail View'
-      );
-      if (res.success) {
-        success(`Complaint ${complaint.complaint_id} has been permanently deleted.`);
-        setShowDeleteModal(false);
-        navigate('/admin/complaints');
-      } else {
-        error(res.message || 'Failed to delete complaint.');
-      }
-    } catch {
-      error('An error occurred while deleting the complaint.');
-    } finally {
-      setIsDeleting(false);
+  const handleApplyTemplate = (templateText: string) => {
+    if (resolutionNote.trim() && !resolutionNote.includes(templateText)) {
+      setResolutionNote((prev) => `${prev.trim()}\n• ${templateText}`);
+    } else {
+      setResolutionNote(templateText);
     }
   };
 
-  const handleApplyTemplate = (templateText: string) => {
-    if (resolutionNote.trim() && !resolutionNote.includes(templateText)) {
-      setResolutionNote((prev) => `${prev.trim()}\n${templateText}`);
-    } else {
-      setResolutionNote(templateText);
+  const handleDeleteComplaint = async () => {
+    if (!onDelete) return;
+    setIsDeleting(true);
+    try {
+      const isSuccess = await onDelete(complaint.complaint_id);
+      if (isSuccess) {
+        success(`Complaint ${complaint.complaint_id} permanently deleted.`);
+      } else {
+        error('Failed to delete complaint.');
+      }
+    } catch {
+      error('An error occurred during deletion.');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -166,11 +157,18 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
       setStatus(overrideStatus);
     }
 
-    const isSuccess = await onUpdate(dto);
-    if (isSuccess) {
-      success(`Complaint ${complaint.complaint_id} updated successfully.`);
-    } else {
-      error('Failed to update complaint. Please try again.');
+    setLocalIsUpdating(true);
+    try {
+      const isSuccess = await onUpdate(dto);
+      if (isSuccess) {
+        success(`Complaint ${complaint.complaint_id} updated successfully.`);
+      } else {
+        error('Failed to update complaint. Please try again.');
+      }
+    } catch {
+      error('Failed to update complaint.');
+    } finally {
+      setLocalIsUpdating(false);
     }
   };
 
@@ -203,9 +201,12 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
   const currentStep = getStepIndex(complaint.status);
 
   return (
-    <div className="space-y-6">
-      {/* 1. Header Card (ink-navy, rounded-2xl with TicketStub signature divider) */}
-      <div className="relative overflow-hidden rounded-2xl bg-ink-navy text-white p-6 sm:p-8 border border-ink-navy shadow-md">
+    <div className="space-y-6 animate-fade-in">
+      {/* 1. Header Card (ink-navy-card, rounded-2xl with TicketStub signature divider) */}
+      <div
+        className="relative overflow-hidden rounded-2xl bg-ink-navy-card text-white p-6 sm:p-8 border border-white/10 shadow-md"
+        style={{ backgroundColor: '#16234A' }}
+      >
         {/* Top Meta Bar */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -357,7 +358,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
         {/* ========================================================================= */}
         <div className="lg:col-span-7 space-y-6">
           {/* Student Complaint Statement Card */}
-          <Card>
+          <Card className="bg-paper-card border border-hairline shadow-sm">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
@@ -370,7 +371,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
 
             {/* Category / Location 2-Up Info Tiles */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              <div className="p-3.5 rounded-xl bg-paper border border-hairline">
+              <div className="p-3.5 rounded-xl bg-paper-recessed border border-hairline">
                 <span className="text-[10px] font-mono font-medium text-ink-muted uppercase tracking-wider block mb-0.5">
                   Category
                 </span>
@@ -384,7 +385,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                 </Link>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-paper border border-hairline">
+              <div className="p-3.5 rounded-xl bg-paper-recessed border border-hairline">
                 <span className="text-[10px] font-mono font-medium text-ink-muted uppercase tracking-wider block mb-0.5">
                   Incident Location
                 </span>
@@ -400,7 +401,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
             </div>
 
             {/* Detailed Description Block */}
-            <div className="p-4 sm:p-5 rounded-lg bg-paper border border-hairline">
+            <div className="p-4 sm:p-5 rounded-lg bg-paper-recessed border border-hairline">
               <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted block mb-2 font-medium">
                 Detailed Description
               </span>
@@ -411,7 +412,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
           </Card>
 
           {/* Student Identity & Verification Card */}
-          <Card>
+          <Card className="bg-paper-card border border-hairline shadow-sm">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
@@ -424,7 +425,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
 
             {complaint.is_anonymous ? (
               <div className="p-5 rounded-xl bg-ledger-green/10 border border-ledger-green/20 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                   <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
@@ -434,7 +435,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     </h4>
                     <Pill variant="resolved" size="sm" label="Protected" />
                   </div>
-                  <p className="text-xs text-ink-muted leading-relaxed">
+                  <p className="text-xs text-ink-muted leading-relaxed font-sans">
                     The student submitted this complaint without personal identifiers to ensure unbiased reporting. Student rights and privacy are strictly safeguarded under the Proctorial Grievance Policy.
                   </p>
                 </div>
@@ -442,8 +443,8 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
             ) : (
               <div className="space-y-3.5">
                 {/* Student Bio Capsule */}
-                <div className="p-3.5 rounded-xl bg-paper border border-hairline flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-registrar-blue text-white flex items-center justify-center font-mono font-semibold text-sm flex-shrink-0">
+                <div className="p-3.5 rounded-xl bg-paper-recessed border border-hairline flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-registrar-blue text-white flex items-center justify-center font-mono font-semibold text-sm flex-shrink-0 shadow-xs">
                     {complaint.student_name ? complaint.student_name.slice(0, 2).toUpperCase() : 'ST'}
                   </div>
                   <div>
@@ -456,7 +457,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
 
                 {/* Key-Value Details Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="p-3 rounded-lg bg-paper border border-hairline">
+                  <div className="p-3 rounded-lg bg-paper-recessed border border-hairline">
                     <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Department
                     </span>
@@ -466,7 +467,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-paper border border-hairline">
+                  <div className="p-3 rounded-lg bg-paper-recessed border border-hairline">
                     <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Semester / Batch
                     </span>
@@ -476,7 +477,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-paper border border-hairline sm:col-span-2">
+                  <div className="p-3 rounded-lg bg-paper-recessed border border-hairline sm:col-span-2">
                     <span className="text-[10px] font-mono text-ink-muted uppercase block mb-0.5">
                       Contact Phone / Email
                     </span>
@@ -495,7 +496,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
         {/* RIGHT COLUMN: Proctor Action & Resolution (5 cols) */}
         {/* ========================================================================= */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="border-hairline shadow-sm">
+          <Card className="bg-paper-card border border-hairline shadow-sm">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
@@ -528,7 +529,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                         className={`px-3 py-2.5 rounded-lg text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 ${
                           isSelected
                             ? selectedStyle
-                            : 'bg-paper text-ink-navy border-hairline hover:bg-paper-card'
+                            : 'bg-paper-recessed text-ink-navy border-hairline hover:bg-paper-card'
                         }`}
                       >
                         {st === 'Resolved' && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -550,10 +551,10 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                 <div className="grid grid-cols-4 gap-1.5">
                   {(['Low', 'Medium', 'High', 'Critical'] as ComplaintPriority[]).map((pr) => {
                     const isSelected = priority === pr;
-                    let selectedStyle = 'bg-ink-muted text-white border-ink-muted';
-                    if (pr === 'Medium') selectedStyle = 'bg-registrar-blue text-white border-registrar-blue';
-                    if (pr === 'High') selectedStyle = 'bg-seal-gold text-white border-seal-gold';
-                    if (pr === 'Critical') selectedStyle = 'bg-case-red text-white border-case-red';
+                    let selectedStyle = 'bg-ink-muted text-white border-ink-muted shadow-sm';
+                    if (pr === 'Medium') selectedStyle = 'bg-registrar-blue text-white border-registrar-blue shadow-sm';
+                    if (pr === 'High') selectedStyle = 'bg-seal-gold text-white border-seal-gold shadow-sm';
+                    if (pr === 'Critical') selectedStyle = 'bg-case-red text-white border-case-red shadow-sm';
 
                     return (
                       <button
@@ -563,7 +564,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                         className={`py-2 px-1 rounded-lg text-[11px] font-medium border transition-colors text-center ${
                           isSelected
                             ? selectedStyle
-                            : 'bg-paper text-ink-muted border-hairline hover:bg-paper-card'
+                            : 'bg-paper-recessed text-ink-muted border-hairline hover:bg-paper-card'
                         }`}
                       >
                         {pr === 'Critical' && <Flame className="w-3 h-3 inline mr-1 text-seal-gold" />}
@@ -603,7 +604,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                         type="button"
                         key={idx}
                         onClick={() => handleApplyTemplate(tmpl)}
-                        className="text-[10px] text-ink-muted bg-paper hover:bg-registrar-blue/5 hover:text-registrar-blue hover:border-registrar-blue/30 px-2.5 py-1 rounded-lg border border-hairline transition-colors text-left"
+                        className="text-[10px] text-ink-muted bg-paper-recessed hover:bg-registrar-blue/5 hover:text-registrar-blue hover:border-registrar-blue/30 px-2.5 py-1 rounded-lg border border-hairline transition-colors text-left"
                       >
                         + {tmpl.slice(0, 36)}...
                       </button>
@@ -617,7 +618,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full py-3 text-sm font-medium"
+                  className="w-full py-3 text-sm font-medium shadow-sm"
                   isLoading={isUpdating}
                   leftIcon={<Save className="w-4 h-4" />}
                 >
@@ -629,7 +630,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     type="button"
                     onClick={handleQuickResolve}
                     disabled={isUpdating}
-                    className="w-full py-2.5 px-3 rounded-lg text-xs font-medium text-ledger-green bg-ledger-green/10 hover:bg-ledger-green/20 border border-ledger-green/30 transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-3 rounded-lg text-xs font-medium text-ledger-green bg-ledger-green/10 hover:bg-ledger-green/20 border border-ledger-green/30 transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-ledger-green" />
                     <span>1-Click Mark as Resolved &amp; Close</span>
@@ -640,14 +641,14 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
           </Card>
 
           {/* 5. Danger Zone: Isolated and Case-Red Tinted */}
-          <div className="p-4 rounded-xl bg-case-red/5 border border-case-red/20 space-y-2">
+          <div className="p-4 rounded-xl bg-case-red/5 border border-case-red/20 space-y-2 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-semibold uppercase tracking-wider text-case-red flex items-center gap-1.5">
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete Ticket</span>
               </span>
             </div>
-            <p className="text-[11px] text-ink-muted leading-relaxed">
+            <p className="text-[11px] text-ink-muted leading-relaxed font-sans">
               Permanently erase this complaint and its resolution log from the database.
             </p>
             <button

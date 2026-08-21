@@ -51,11 +51,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             ref={ref}
             maxLength={maxLength}
             value={value}
-            className={`block w-full rounded-xl border bg-white text-slate-900 placeholder:text-slate-400 text-sm p-3.5 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed resize-y min-h-[120px] ${
-              error
+            className={`block w-full rounded-xl border bg-white text-slate-900 placeholder:text-slate-400 text-sm p-3.5 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed resize-y min-h-[120px] ${error
                 ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20 text-rose-900 bg-rose-50/20'
                 : 'border-slate-300 hover:border-slate-400 focus:border-brand-500 focus:ring-brand-500/20'
-            } ${className}`}
+              } ${className}`}
             {...props}
           />
         </div>

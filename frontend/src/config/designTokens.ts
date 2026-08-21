@@ -1,61 +1,45 @@
 /**
- * Shared Design System Tokens
- * Defines official color hexes, typography rules, and status visual tokens.
+ * Design Tokens Configuration for College QR Complaint Box
+ * Strictly enforces official institutional color hierarchy and 3-level surface elevation.
  */
 
-export const DESIGN_TOKENS = {
+export const TOKENS = {
   colors: {
-    inkNavy: '#101B36',      // primary dark — headers, sidebar, dark sections, primary text on light bg
-    registrarBlue: '#2455A4', // primary actions, links, active states
-    sealGold: '#B8873B',     // accent — badges, ticket stub motif, hover highlights, official emphasis
-    ledgerGreen: '#1D7A5F',  // privacy/anonymous/resolved states
-    caseRed: '#B3261E',      // critical/high priority/rejected — muted brick red
-    paper: '#F4F6F9',        // page background — cool, not warm cream
-    paperCard: '#FFFFFF',    // card surfaces
-    inkMuted: '#5B6472',     // secondary text
-    hairline: '#E2E6ED',     // borders/dividers
+    inkNavy: '#101B36',
+    inkNavyCard: '#16234A',
+    registrarBlue: '#2455A4',
+    sealGold: '#B8873B',
+    ledgerGreen: '#1D7A5F',
+    caseRed: '#B3261E',
+
+    // 3-Level Surface Elevation Scale
+    surface0: '#EAEDF3',          // Page/main-content background canvas
+    paper: '#EAEDF3',
+    surface1: '#FFFFFF',          // Card, table container, form section, topbar
+    paperCard: '#FFFFFF',
+    surface2: '#F3F5F9',          // Recessed items inside cards (quotes, stripes, chips, unhovered inputs)
+    paperRecessed: '#F3F5F9',
+
+    inkMuted: '#5B6472',
+    hairline: '#D7DEE8',          // Distinct border divider
   },
-  fontFamilies: {
+  fonts: {
     display: 'Fraunces, Georgia, serif',
-    body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-    mono: '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    sans: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace',
   },
-  transitions: {
-    interactive: 'transition-colors duration-150 ease-in-out',
-    fadeUp: 'animate-fade-up',
-  },
-  statusStyles: {
-    new: {
-      bg: 'bg-registrar-blue/10',
-      text: 'text-registrar-blue',
-      border: 'border-registrar-blue/20',
-      dot: 'bg-registrar-blue',
-    },
-    inProgress: {
-      bg: 'bg-seal-gold/10',
-      text: 'text-seal-gold',
-      border: 'border-seal-gold/20',
-      dot: 'bg-seal-gold',
-    },
-    resolved: {
-      bg: 'bg-ledger-green/10',
-      text: 'text-ledger-green',
-      border: 'border-ledger-green/20',
-      dot: 'bg-ledger-green',
-    },
-    rejected: {
-      bg: 'bg-case-red/10',
-      text: 'text-case-red',
-      border: 'border-case-red/20',
-      dot: 'bg-case-red',
-    },
-    neutral: {
-      bg: 'bg-ink-muted/10',
-      text: 'text-ink-muted',
-      border: 'border-ink-muted/20',
-      dot: 'bg-ink-muted',
-    },
-  },
+  elevation: {
+    card: 'bg-paper-card border border-hairline shadow-sm',
+    cardHover: 'hover:shadow-md transition-shadow duration-150',
+    recessed: 'bg-paper-recessed border border-hairline',
+    navyCard: 'bg-ink-navy-card border border-white/10 text-white',
+  }
 } as const;
 
-export type DesignTokenColors = typeof DESIGN_TOKENS.colors;
+export const STATUS_PILL_STYLES = {
+  new: 'bg-registrar-blue/10 text-registrar-blue border border-registrar-blue/20',
+  inProgress: 'bg-seal-gold/15 text-seal-gold border border-seal-gold/30',
+  resolved: 'bg-ledger-green/10 text-ledger-green border border-ledger-green/20',
+  rejected: 'bg-case-red/10 text-case-red border border-case-red/20',
+  neutral: 'bg-paper-recessed text-ink-muted border border-hairline',
+} as const;

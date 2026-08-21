@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Complaint } from '../types';
 import { apiService } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { useRefresh } from '../contexts/RefreshContext';
 
 export interface UseComplaintsOptions {
   search?: string;
@@ -16,13 +15,15 @@ export interface UseComplaintsOptions {
 
 export function useComplaints(options: UseComplaintsOptions = {}) {
   const { token } = useAuth();
-  const { registerRefreshHandler, refreshKey } = useRefresh();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const hasLoadedRef = useRef<boolean>(false);
 
-  const fetchComplaints = useCallback(async () => {
-    setIsLoading(true);
+  const fetchComplaints = useCallback(async (isInitial: boolean = false) => {
+    if (isInitial || !hasLoadedRef.current) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const response = await apiService.getComplaints({
@@ -37,6 +38,7 @@ export function useComplaints(options: UseComplaintsOptions = {}) {
 
       if (response.success && response.data) {
         setComplaints(response.data);
+        hasLoadedRef.current = true;
       } else {
         setError(response.message || 'Failed to fetch complaints.');
       }
@@ -49,19 +51,14 @@ export function useComplaints(options: UseComplaintsOptions = {}) {
 
   useEffect(() => {
     if (options.autoFetch !== false) {
-      fetchComplaints();
+      fetchComplaints(!hasLoadedRef.current);
     }
-  }, [fetchComplaints, options.autoFetch, refreshKey]);
-
-  useEffect(() => {
-    const unregister = registerRefreshHandler(`complaints_${Math.random()}`, fetchComplaints);
-    return unregister;
-  }, [registerRefreshHandler, fetchComplaints]);
+  }, [fetchComplaints, options.autoFetch]);
 
   return {
     complaints,
     isLoading,
     error,
-    refetch: fetchComplaints,
+    refetch: () => fetchComplaints(false),
   };
 }

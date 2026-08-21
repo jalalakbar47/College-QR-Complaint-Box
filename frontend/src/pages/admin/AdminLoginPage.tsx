@@ -59,7 +59,10 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ink-navy flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div
+      className="min-h-screen bg-ink-navy flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      style={{ backgroundColor: '#101B36' }}
+    >
       {/* Subtle fine dot-grid texture on full-bleed ink-navy background */}
       <div className="absolute inset-0 bg-dots-pattern opacity-10 pointer-events-none" />
 

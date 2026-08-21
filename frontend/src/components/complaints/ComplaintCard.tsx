@@ -78,7 +78,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
 
         {/* Category & Location */}
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-ink-muted">
-          <span className="font-medium text-ink-navy bg-paper px-2 py-0.5 rounded border border-hairline">
+          <span className="font-semibold text-ink-navy bg-paper-recessed px-2 py-0.5 rounded border border-hairline">
             {complaint.category}
           </span>
           <div className="flex items-center gap-1">
@@ -88,7 +88,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         </div>
 
         {/* Description snippet */}
-        <p className="text-xs text-ink-muted line-clamp-2 leading-relaxed">
+        <p className="text-xs text-ink-muted line-clamp-2 leading-relaxed font-sans">
           {complaint.description}
         </p>
 

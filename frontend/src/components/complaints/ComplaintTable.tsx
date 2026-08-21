@@ -89,11 +89,11 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
         ))}
       </div>
 
-      {/* Desktop Table View (>= 768px) with Compact TicketStub Influence & Clickable Rows */}
+      {/* Desktop Table View (>= 768px) with 3-Level Elevation & Distinct Borders */}
       <div className="hidden md:block w-full overflow-x-auto rounded-xl border border-hairline bg-paper-card shadow-sm">
         <Table className="table-auto w-full">
           <TableHead>
-            <TableRow className="border-b border-hairline bg-paper">
+            <TableRow className="border-b border-hairline bg-paper-recessed">
               <TableHeaderCell className="w-36 font-mono text-[11px] uppercase tracking-wider text-ink-muted py-3">
                 ID &amp; Date
               </TableHeaderCell>
@@ -125,7 +125,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                     navigate(`/admin/complaints/${c.complaint_id}`);
                   }}
                   className={`border-b border-hairline transition-colors duration-150 hover:bg-registrar-blue/5 cursor-pointer ${
-                    isEven ? 'bg-paper-card' : 'bg-paper/40'
+                    isEven ? 'bg-paper-card' : 'bg-paper-recessed/60'
                   }`}
                 >
                   {/* ID & Date (Mono ticket code style) */}
@@ -160,7 +160,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                           {c.title}
                         </p>
                       </div>
-                      <p className="text-[11px] text-ink-muted line-clamp-1">{c.description}</p>
+                      <p className="text-[11px] text-ink-muted line-clamp-1 font-sans">{c.description}</p>
                     </div>
                   </TableCell>
 

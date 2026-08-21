@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Admin, Complaint, UpdateComplaintDTO } from '../../types';
 import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { useRefresh } from '../../contexts/RefreshContext';
 import { ComplaintDetailView } from '../../components/complaints/ComplaintDetailView';
 import { ComplaintDetailSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -12,8 +11,8 @@ import { Button } from '../../components/ui/Button';
 
 export const AdminComplaintDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { token } = useAuth();
-  const { registerRefreshHandler, refreshKey } = useRefresh();
+  const navigate = useNavigate();
+  const { token, admin } = useAuth();
 
   const [complaint, setComplaint] = useState<Complaint | null>(null);
   const [admins, setAdmins] = useState<Admin[]>([]);
@@ -21,9 +20,11 @@ export const AdminComplaintDetailPage: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isInitial: boolean = false) => {
     if (!id) return;
-    setIsLoading(true);
+    if (isInitial) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const [compRes, adminRes] = await Promise.all([
@@ -48,13 +49,8 @@ export const AdminComplaintDetailPage: React.FC = () => {
   }, [id, token]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData, refreshKey]);
-
-  useEffect(() => {
-    const unregister = registerRefreshHandler(`complaint_detail_${id}`, fetchData);
-    return unregister;
-  }, [registerRefreshHandler, fetchData, id]);
+    fetchData(true);
+  }, [fetchData]);
 
   const handleUpdate = async (dto: UpdateComplaintDTO): Promise<boolean> => {
     setIsUpdating(true);
@@ -69,6 +65,24 @@ export const AdminComplaintDetailPage: React.FC = () => {
       return false;
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async (complaintId: string): Promise<boolean> => {
+    try {
+      const res = await apiService.deleteComplaint(
+        complaintId,
+        token || undefined,
+        admin?.admin_id,
+        'Permanently deleted by Chief Proctor from Detail Page'
+      );
+      if (res.success) {
+        navigate('/admin/complaints', { replace: true });
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
   };
 
@@ -87,7 +101,7 @@ export const AdminComplaintDetailPage: React.FC = () => {
     );
   }
 
-  if (error || !complaint) {
+  if (error && !complaint) {
     return (
       <div className="py-8 space-y-4">
         <Link to="/admin/complaints">
@@ -98,11 +112,13 @@ export const AdminComplaintDetailPage: React.FC = () => {
         <ErrorState
           title="Complaint Record Not Found"
           message={error || `Could not locate record with ID: "${id}"`}
-          onRetry={fetchData}
+          onRetry={() => fetchData(true)}
         />
       </div>
     );
   }
+
+  if (!complaint) return null;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -120,8 +136,8 @@ export const AdminComplaintDetailPage: React.FC = () => {
         </Link>
 
         <div className="flex items-center gap-2 font-mono text-xs text-ink-muted">
-          <span className="w-2 h-2 rounded-full bg-ledger-green animate-pulse" />
-          <span className="hidden sm:inline font-medium">Real-time sync active</span>
+          <span className="w-2 h-2 rounded-full bg-ledger-green" />
+          <span className="hidden sm:inline font-medium">Synced</span>
         </div>
       </div>
 
@@ -130,6 +146,7 @@ export const AdminComplaintDetailPage: React.FC = () => {
         complaint={complaint}
         admins={admins}
         onUpdate={handleUpdate}
+        onDelete={handleDelete}
         isUpdating={isUpdating}
       />
     </div>
