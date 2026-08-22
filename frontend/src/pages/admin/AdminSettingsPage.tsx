@@ -35,6 +35,8 @@ import { apiService } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { ENV } from '../../config/env';
+import { motion } from 'framer-motion';
+import { MOTION_EASINGS } from '../../lib/motion';
 
 export const AdminSettingsPage: React.FC = () => {
   const { locations } = useLocations();
@@ -238,11 +240,16 @@ export const AdminSettingsPage: React.FC = () => {
           {/* LEFT COLUMN: Campus QR Placard Card (5 cols) */}
           {/* ========================================================================= */}
           <div className="lg:col-span-5 space-y-4">
-            <TicketStub
-              eyebrow="CAMPUS QR PLACARD"
-              referenceId={activeLocation}
-              statusPill={<Pill variant="resolved" size="sm" label="Live" />}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, ease: MOTION_EASINGS.easeOutQuart }}
             >
+              <TicketStub
+                eyebrow="CAMPUS QR PLACARD"
+                referenceId={activeLocation}
+                statusPill={<Pill variant="resolved" size="sm" label="Live" />}
+              >
               <div className="flex flex-col items-center text-center space-y-3.5">
                 {/* Location Selectors */}
                 <div className="w-full space-y-2.5 text-left">
@@ -365,7 +372,8 @@ export const AdminSettingsPage: React.FC = () => {
                 </Button>
               </div>
             </TicketStub>
-          </div>
+          </motion.div>
+        </div>
 
           {/* ========================================================================= */}
           {/* RIGHT COLUMN: Portal Settings Card (7 cols) */}

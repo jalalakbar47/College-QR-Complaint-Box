@@ -19,6 +19,7 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { TicketStub } from '../../components/ui/TicketStub';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { motion } from 'framer-motion';
 
 const LIFECYCLE_STEPS = [
   { step: 1, label: 'Logged', desc: 'Received in portal' },
@@ -232,7 +233,7 @@ export const TrackComplaintPage: React.FC = () => {
                         return (
                           <div
                             key={s.step}
-                            className={`p-3 rounded-xl border transition-all ${
+                            className={`p-3 rounded-xl border relative overflow-hidden transition-colors ${
                               isCurrent
                                 ? 'bg-seal-gold/10 border-seal-gold/40 text-ink-navy ring-1 ring-seal-gold/30'
                                 : isDone
@@ -240,7 +241,15 @@ export const TrackComplaintPage: React.FC = () => {
                                 : 'bg-paper-recessed border-hairline text-ink-muted'
                             }`}
                           >
-                            <div className="flex items-center gap-2 mb-1">
+                            {isCurrent && (
+                              <motion.div
+                                initial={{ width: '0%' }}
+                                animate={{ width: '100%' }}
+                                transition={{ duration: 0.4, ease: 'linear' }}
+                                className="absolute bottom-0 left-0 h-0.5 bg-seal-gold"
+                              />
+                            )}
+                            <div className="flex items-center gap-2 mb-1 relative z-10">
                               <div
                                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                                   isDone
@@ -254,7 +263,7 @@ export const TrackComplaintPage: React.FC = () => {
                               </div>
                               <span className="text-xs font-semibold truncate">{s.label}</span>
                             </div>
-                            <span className="text-[10px] text-ink-muted block truncate font-sans">{s.desc}</span>
+                            <span className="text-[10px] text-ink-muted block truncate font-sans relative z-10">{s.desc}</span>
                           </div>
                         );
                       })}

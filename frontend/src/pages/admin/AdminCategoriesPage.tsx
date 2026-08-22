@@ -28,6 +28,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Category } from '../../types';
 import { apiService } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
+import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
@@ -35,6 +36,10 @@ import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { TableSkeleton } from '../../components/ui/Skeleton';
+import {
+  createStaggerContainer,
+  staggerItemVariants,
+} from '../../lib/motion';
 
 // Available icons for category picker
 export const ICON_OPTIONS: { name: string; label: string; icon: React.FC<{ className?: string }> }[] = [
@@ -292,7 +297,12 @@ export const AdminCategoriesPage: React.FC = () => {
         </div>
       ) : localCategories.length > 0 ? (
         <div className="bg-paper-card rounded-xl border border-hairline shadow-sm overflow-hidden">
-          <div className="divide-y divide-hairline">
+          <motion.div
+            variants={createStaggerContainer(0.04)}
+            initial="initial"
+            animate="animate"
+            className="divide-y divide-hairline"
+          >
             {localCategories.map((cat, index) => {
               const IconComponent = getCategoryIconComponent(cat);
               const liaison = getCategoryLiaison(cat);
@@ -300,8 +310,9 @@ export const AdminCategoriesPage: React.FC = () => {
               const isActive = cat.status === 'Active';
 
               return (
-                <div
+                <motion.div
                   key={cat.category_id}
+                  variants={staggerItemVariants}
                   draggable
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
@@ -377,31 +388,33 @@ export const AdminCategoriesPage: React.FC = () => {
 
                     {/* Edit & Delete Action Buttons */}
                     <div className="flex items-center gap-1">
-                      <button
+                      <motion.button
                         type="button"
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => openEditModal(cat)}
                         className="p-1.5 rounded-lg text-ink-muted hover:text-registrar-blue hover:bg-registrar-blue/10 border border-transparent hover:border-registrar-blue/20 transition-colors"
                         title="Edit Category"
                         aria-label={`Edit category ${cat.category_name}`}
                       >
                         <Edit2 className="w-4 h-4" />
-                      </button>
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         type="button"
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setDeletingCategoryId(cat.category_id)}
                         className="p-1.5 rounded-lg text-ink-muted hover:text-case-red hover:bg-case-red/10 border border-transparent hover:border-case-red/20 transition-colors"
                         title="Delete Category"
                         aria-label={`Delete category ${cat.category_name}`}
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       ) : (
         /* 3. Empty State (per design system's voice guidance) */

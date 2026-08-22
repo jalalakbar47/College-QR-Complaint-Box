@@ -13,6 +13,7 @@ import { useLocations } from '../../hooks/useLocations';
 import { LocationItem } from '../../types';
 import { apiService } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
+import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
@@ -22,6 +23,10 @@ import { TableSkeleton } from '../../components/ui/Skeleton';
 import { PrintableQRCard } from '../../components/qr/PrintableQRCard';
 import { ENV } from '../../config/env';
 import { useAuth } from '../../contexts/AuthContext';
+import {
+  createStaggerContainer,
+  staggerItemVariants,
+} from '../../lib/motion';
 
 // Default block/building mappings for campus locations
 const DEFAULT_BUILDINGS: Record<string, string> = {
@@ -246,15 +251,21 @@ export const AdminLocationsPage: React.FC = () => {
           </div>
         ) : localLocations.length > 0 ? (
           <div className="bg-paper-card rounded-xl border border-hairline shadow-sm overflow-hidden">
-            <div className="divide-y divide-hairline">
+            <motion.div
+              variants={createStaggerContainer(0.04)}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-hairline"
+            >
               {localLocations.map((loc, index) => {
                 const buildingName = getLocationBuilding(loc);
                 const isEven = index % 2 === 0;
                 const isActive = loc.status === 'Active';
 
                 return (
-                  <div
+                  <motion.div
                     key={loc.location_id}
+                    variants={staggerItemVariants}
                     draggable
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
@@ -344,31 +355,33 @@ export const AdminLocationsPage: React.FC = () => {
 
                       {/* Edit & Delete Action Buttons */}
                       <div className="flex items-center gap-1">
-                        <button
+                        <motion.button
                           type="button"
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => openEditModal(loc)}
                           className="p-1.5 rounded-lg text-ink-muted hover:text-registrar-blue hover:bg-registrar-blue/10 border border-transparent hover:border-registrar-blue/20 transition-colors"
                           title="Edit Location"
                           aria-label={`Edit location ${loc.location_name}`}
                         >
                           <Edit2 className="w-4 h-4" />
-                        </button>
+                        </motion.button>
 
-                        <button
+                        <motion.button
                           type="button"
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => setDeletingLocationId(loc.location_id)}
                           className="p-1.5 rounded-lg text-ink-muted hover:text-case-red hover:bg-case-red/10 border border-transparent hover:border-case-red/20 transition-colors"
                           title="Delete Location"
                           aria-label={`Delete location ${loc.location_name}`}
                         >
                           <Trash2 className="w-4 h-4" />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         ) : (
           /* 3. Empty State */

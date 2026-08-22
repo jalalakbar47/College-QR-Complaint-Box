@@ -1,62 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   ShieldCheck,
   PlusCircle,
   Search,
-  Lock,
-  HeartHandshake,
   CheckCircle2,
+  FileCheck,
+  Zap,
+  HeartHandshake,
+  Download,
+  Copy,
+  Check,
+  Lock,
+  ChevronRight,
   ArrowRight,
   BookOpen,
   GraduationCap,
-  Sparkles,
-  Zap,
+  AlertTriangle,
+  Flame,
   Building,
+  Lightbulb,
+  Sparkles,
+  Droplets,
   Wifi,
   Bus,
-  Droplets,
-  ShieldAlert,
-  UserX,
-  FileCheck,
-  ChevronRight,
-  Copy,
-  Download,
-  Check,
   ExternalLink,
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../../components/ui/Button';
 import { Pill } from '../../components/ui/Pill';
 import { TicketStub } from '../../components/ui/TicketStub';
 import { SectionEyebrow } from '../../components/ui/SectionEyebrow';
 import { useToast } from '../../contexts/ToastContext';
 import { ENV } from '../../config/env';
+import {
+  usePrefersReducedMotion,
+  MOTION_EASINGS,
+} from '../../lib/motion';
 
 const CATEGORY_SHOWCASE = [
-  { name: 'Academic & Lectures', icon: BookOpen },
-  { name: 'Examination & Grades', icon: GraduationCap },
-  { name: 'Harassment & Safety', icon: ShieldAlert },
-  { name: 'Anti-Bullying & Ragging', icon: UserX },
-  { name: 'Infrastructure & Labs', icon: Building },
-  { name: 'Electricity & Backup', icon: Zap },
-  { name: 'Cleanliness & Hygiene', icon: Sparkles },
-  { name: 'Drinking Water & Restrooms', icon: Droplets },
-  { name: 'Campus Wi-Fi & IT Labs', icon: Wifi },
-  { name: 'College Transport Buses', icon: Bus },
+  { icon: BookOpen, name: 'Academic & Lectures', liaison: 'Academic Cell' },
+  { icon: GraduationCap, name: 'Examination & Grades', liaison: 'Controller Exams' },
+  { icon: AlertTriangle, name: 'Harassment & Safety', liaison: 'Discipline Committee' },
+  { icon: Flame, name: 'Anti-Bullying & Ragging', liaison: 'Chief Proctor Office' },
+  { icon: Building, name: 'Infrastructure & Labs', liaison: 'Works & Maintenance' },
+  { icon: Lightbulb, name: 'Electricity & Backup', liaison: 'Power Operations' },
+  { icon: Sparkles, name: 'Cleanliness & Hygiene', liaison: 'Sanitation Wing' },
+  { icon: Droplets, name: 'Drinking Water & Restrooms', liaison: 'Public Health Dept' },
+  { icon: Wifi, name: 'Campus Wi-Fi & IT Labs', liaison: 'IT Support Center' },
+  { icon: Bus, name: 'Transport & Buses', liaison: 'Transport Officer' },
+];
+
+const WORKFLOW_STEPS = [
+  {
+    step: 1,
+    title: 'Scan Campus QR Code',
+    desc: 'Look for official QR code placards installed across lecture halls, labs, hostels, cafeteria, and college entrance gates.',
+  },
+  {
+    step: 2,
+    title: 'Select Category & Describe Issue',
+    desc: 'Choose the issue type (academic, infrastructure, hygiene, ragging, harassment, electricity, etc.) and describe what happened clearly.',
+  },
+  {
+    step: 3,
+    title: 'Submit Anonymously or with Info',
+    desc: 'Choose whether you wish to submit your student ID or submit 100% anonymously. Receive a unique Reference ID instantly.',
+  },
+  {
+    step: 4,
+    title: 'Track Status & Proctor Resolution',
+    desc: 'Use your Reference ID to check live updates as the Proctor reviews, assigns, and resolves your complaint.',
+  },
 ];
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { success } = useToast();
-  const [quickTrackId, setQuickTrackId] = useState('');
   const [copied, setCopied] = useState(false);
-  const qrRef = React.useRef<HTMLDivElement>(null);
+  const [quickTrackId, setQuickTrackId] = useState('');
+  const qrRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  const portalComplaintUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/complaint`
-      : 'http://localhost:3000/complaint';
+  const portalComplaintUrl = `${window.location.origin}/complaint`;
 
   const handleQuickTrack = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +95,7 @@ export const LandingPage: React.FC = () => {
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(portalComplaintUrl);
     setCopied(true);
-    success('Complaint portal link copied to clipboard!');
+    success('Portal submission link copied to clipboard.');
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -122,9 +149,14 @@ export const LandingPage: React.FC = () => {
           <div className="absolute inset-0 bg-dots-pattern opacity-5" />
         </div>
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-6 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: MOTION_EASINGS.easeOutQuart }}
+          className="relative max-w-5xl mx-auto text-center space-y-6 z-10"
+        >
           {/* Institution Eyebrow Pill on Dark Background */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-seal-gold flex-shrink-0" />
             <span className="truncate">{ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}</span>
           </div>
@@ -164,57 +196,56 @@ export const LandingPage: React.FC = () => {
               </Button>
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* 2. Trust Strip (4 items, floating card row overlapping hero) */}
+      {/* 2. Trust Strip (4 items, floating card row overlapping hero with Scroll Stagger) */}
       <section className="-mt-10 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 relative z-20">
-        <div className="bg-paper-card rounded-xl border border-hairline shadow-sm p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
-            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="w-4 h-4 text-ledger-green" />
-            </div>
-            <div className="min-w-0">
-              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">100% Anonymous</span>
-              <span className="text-[11px] text-ink-muted block truncate">Zero identity logs</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
-            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
-              <ShieldCheck className="w-4 h-4 text-seal-gold" />
-            </div>
-            <div className="min-w-0">
-              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Chief Proctor</span>
-              <span className="text-[11px] text-ink-muted block truncate">Direct supervision</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
-            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
-              <FileCheck className="w-4 h-4 text-registrar-blue" />
-            </div>
-            <div className="min-w-0">
-              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Unique CQB ID</span>
-              <span className="text-[11px] text-ink-muted block truncate">Instant tracking code</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline">
-            <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0">
-              <Zap className="w-4 h-4 text-seal-gold" />
-            </div>
-            <div className="min-w-0">
-              <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">Swift Redressal</span>
-              <span className="text-[11px] text-ink-muted block truncate">Fast action cycle</span>
-            </div>
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.4, ease: MOTION_EASINGS.easeOutQuart }}
+          className="bg-paper-card rounded-xl border border-hairline shadow-sm p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+        >
+          {[
+            { icon: CheckCircle2, iconColor: 'text-ledger-green', title: '100% Anonymous', subtitle: 'Zero identity logs' },
+            { icon: ShieldCheck, iconColor: 'text-seal-gold', title: 'Chief Proctor', subtitle: 'Direct supervision' },
+            { icon: FileCheck, iconColor: 'text-registrar-blue', title: 'Unique CQB ID', subtitle: 'Instant tracking code' },
+            { icon: Zap, iconColor: 'text-seal-gold', title: 'Swift Redressal', subtitle: 'Fast action cycle' },
+          ].map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.3, delay: i * 0.08, ease: MOTION_EASINGS.easeOutQuart }}
+                className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline hover:border-registrar-blue/30 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                  <Icon className={`w-4 h-4 ${item.iconColor}`} />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">{item.title}</span>
+                  <span className="text-[11px] text-ink-muted block truncate">{item.subtitle}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </section>
 
-      {/* 3. Quick Track Bar */}
+      {/* 3. Quick Track Bar (Animates in on scroll) */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6">
-        <div className="p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, ease: MOTION_EASINGS.easeOutQuart }}
+          className="p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm"
+        >
           <form onSubmit={handleQuickTrack} className="flex flex-col sm:flex-row items-center gap-3">
             <div className="flex items-center gap-1.5 text-ink-navy font-mono text-xs font-semibold uppercase tracking-wider pl-1 flex-shrink-0">
               <Search className="w-4 h-4 text-registrar-blue" />
@@ -241,15 +272,21 @@ export const LandingPage: React.FC = () => {
               Track Ticket
             </Button>
           </form>
-        </div>
+        </motion.div>
       </section>
 
       {/* 4. Main Workflow & TicketStub QR Placard Studio */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Left Column (7 cols): Step by Step Journey */}
+          {/* Left Column (7 cols): Step by Step Journey with Scroll Reveal on each Step */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="animate-fade-up space-y-2">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.35, ease: MOTION_EASINGS.easeOutQuart }}
+              className="space-y-2"
+            >
               <SectionEyebrow rulePosition="left">TRANSPARENT PROCESS</SectionEyebrow>
               <h2 className="text-2xl sm:text-4xl font-normal text-ink-navy tracking-tight font-serif">
                 How the QR Complaint Box Works
@@ -257,65 +294,45 @@ export const LandingPage: React.FC = () => {
               <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
                 Designed to make student complaint filing frictionless, safe, and quickly actionable by campus administration.
               </p>
+            </motion.div>
+
+            {/* Stepper Cards with Sequential Scroll Slide-in */}
+            <div className="relative space-y-3.5 pt-1">
+              {WORKFLOW_STEPS.map((s, idx) => (
+                <motion.div
+                  key={s.step}
+                  initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -20, y: 10 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    duration: 0.35,
+                    delay: idx * 0.08,
+                    ease: MOTION_EASINGS.easeOutQuart,
+                  }}
+                  whileHover={prefersReducedMotion ? undefined : { x: 4, transition: { duration: 0.15 } }}
+                  className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm hover:border-registrar-blue/40 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs">
+                    {s.step}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-ink-navy text-sm sm:text-base">{s.title}</h3>
+                    <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
+                      {s.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Stepper Cards */}
-            <div className="relative space-y-4 pt-1">
-              {/* Step 1 */}
-              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  1
-                </div>
-                <div>
-                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Scan Campus QR Code</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
-                    Look for official QR code placards installed across lecture halls, labs, hostels, cafeteria, and college entrance gates.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  2
-                </div>
-                <div>
-                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Select Category &amp; Describe Issue</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
-                    Choose the issue type (academic, infrastructure, hygiene, ragging, harassment, electricity, etc.) and describe what happened clearly.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  3
-                </div>
-                <div>
-                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Submit Anonymously or with Info</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
-                    Choose whether you wish to submit your student ID or submit 100% anonymously. Receive a unique Reference ID instantly.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 4 */}
-              <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl bg-paper-card border border-hairline shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-ink-navy text-white font-mono text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  4
-                </div>
-                <div>
-                  <h3 className="font-semibold text-ink-navy text-sm sm:text-base">Track Status &amp; Proctor Resolution</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed">
-                    Use your Reference ID to check live updates as the Proctor reviews, assigns, and resolves your complaint.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Proctor Privacy Guarantee Callout Box */}
-            <div className="p-5 sm:p-6 rounded-xl bg-ledger-green/10 border border-ledger-green/20 shadow-sm flex items-start gap-4">
+            {/* Proctor Privacy Guarantee Callout Box (Scroll reveal) */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.35, ease: MOTION_EASINGS.easeOutQuart }}
+              className="p-5 sm:p-6 rounded-xl bg-ledger-green/10 border border-ledger-green/20 shadow-sm flex items-start gap-4"
+            >
               <div className="w-9 h-9 rounded-lg bg-ledger-green text-white flex items-center justify-center flex-shrink-0 shadow-xs">
                 <HeartHandshake className="w-5 h-5" />
               </div>
@@ -325,104 +342,124 @@ export const LandingPage: React.FC = () => {
                   Your safety and academic freedom are our highest priority. When "Anonymous" is selected, zero student identifiers are recorded in Google Sheets or backend logs.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Admin Portal Access Link Row */}
-            <Link
-              to="/admin/login"
-              className="flex items-center justify-between p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md text-ink-navy text-xs sm:text-sm font-medium transition-all shadow-sm"
+            {/* Admin Portal Access Link Row (Scroll reveal + hover lift) */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.35, ease: MOTION_EASINGS.easeOutQuart }}
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-paper-recessed border border-hairline flex items-center justify-center text-ink-navy">
-                  <Lock className="w-3.5 h-3.5" />
+              <Link
+                to="/admin/login"
+                className="flex items-center justify-between p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md text-ink-navy text-xs sm:text-sm font-medium transition-all shadow-sm group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-paper-recessed border border-hairline flex items-center justify-center text-ink-navy group-hover:text-registrar-blue transition-colors">
+                    <Lock className="w-3.5 h-3.5" />
+                  </div>
+                  <span>Chief Proctor / Admin Portal Access</span>
                 </div>
-                <span>Chief Proctor / Admin Portal Access</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-ink-muted" />
-            </Link>
+                <ChevronRight className="w-4 h-4 text-ink-muted group-hover:text-registrar-blue group-hover:translate-x-0.5 transition-all" />
+              </Link>
+            </motion.div>
           </div>
 
-          {/* Right Column (5 cols): Sticky TicketStub QR Placard */}
+          {/* Right Column (5 cols): Sticky TicketStub QR Placard with Smooth Entrance on Scroll */}
           <div className="lg:col-span-5">
             <div className="sticky top-24">
-              <TicketStub
-                eyebrow="CAMPUS QR PLACARD"
-                referenceId="Direct Mobile Submission"
-                statusPill={<Pill variant="new" size="sm" label="Scan to Submit" />}
+              <motion.div
+                initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.94, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.45, ease: MOTION_EASINGS.easeOutQuart }}
               >
-                <div className="flex flex-col items-center text-center">
-                  {/* QR Code Container */}
-                  <div
-                    ref={qrRef}
-                    className="p-3 bg-white rounded-lg border border-hairline shadow-sm mb-3 flex items-center justify-center"
-                  >
-                    <QRCodeSVG
-                      value={portalComplaintUrl}
-                      size={180}
-                      level="H"
-                      includeMargin={false}
-                    />
-                  </div>
-
-                  <h4 className="font-semibold text-ink-navy text-sm sm:text-base">
-                    Scan to Submit Complaint
-                  </h4>
-                  <p className="text-xs text-ink-muted max-w-xs mt-0.5 leading-relaxed font-sans">
-                    Point your smartphone camera to instantly open the confidential form
-                  </p>
-
-                  {/* Target URL Chip */}
-                  <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper-recessed border border-hairline text-xs text-ink-muted font-mono my-3.5">
-                    <span className="truncate pr-2">{portalComplaintUrl}</span>
-                    <a
-                      href={portalComplaintUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-registrar-blue hover:text-registrar-blue/80 p-1 flex-shrink-0"
-                      title="Open in new tab"
+                <TicketStub
+                  eyebrow="CAMPUS QR PLACARD"
+                  referenceId="Direct Mobile Submission"
+                  statusPill={<Pill variant="new" size="sm" label="Scan to Submit" />}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    {/* QR Code Container */}
+                    <div
+                      ref={qrRef}
+                      className="p-3 bg-white rounded-lg border border-hairline shadow-sm mb-3 flex items-center justify-center"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
+                      <QRCodeSVG
+                        value={portalComplaintUrl}
+                        size={180}
+                        level="H"
+                        includeMargin={false}
+                      />
+                    </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2 w-full">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="flex-1 text-xs"
-                      onClick={handleCopyUrl}
-                      leftIcon={
-                        copied ? (
-                          <Check className="w-3.5 h-3.5 text-ledger-green" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )
-                      }
-                    >
-                      {copied ? 'Copied' : 'Copy URL'}
-                    </Button>
+                    <h4 className="font-semibold text-ink-navy text-sm sm:text-base">
+                      Scan to Submit Complaint
+                    </h4>
+                    <p className="text-xs text-ink-muted max-w-xs mt-0.5 leading-relaxed font-sans">
+                      Point your smartphone camera to instantly open the confidential form
+                    </p>
 
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="flex-1 text-xs shadow-sm"
-                      onClick={handleDownloadQr}
-                      leftIcon={<Download className="w-3.5 h-3.5" />}
-                    >
-                      Download PNG
-                    </Button>
+                    {/* Target URL Chip */}
+                    <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper-recessed border border-hairline text-xs text-ink-muted font-mono my-3.5">
+                      <span className="truncate pr-2">{portalComplaintUrl}</span>
+                      <a
+                        href={portalComplaintUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-registrar-blue hover:text-registrar-blue/80 p-1 flex-shrink-0"
+                        title="Open in new tab"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 w-full">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={handleCopyUrl}
+                        leftIcon={
+                          copied ? (
+                            <Check className="w-3.5 h-3.5 text-ledger-green" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )
+                        }
+                      >
+                        {copied ? 'Copied' : 'Copy URL'}
+                      </Button>
+
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="flex-1 text-xs shadow-sm"
+                        onClick={handleDownloadQr}
+                        leftIcon={<Download className="w-3.5 h-3.5" />}
+                      >
+                        Download PNG
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </TicketStub>
+                </TicketStub>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Supported Complaint Categories Grid */}
+      {/* 5. Supported Complaint Categories Grid (Cascading Stagger on Scroll + 2px Hover Lift) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2 animate-fade-up">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.35, ease: MOTION_EASINGS.easeOutQuart }}
+          className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2"
+        >
           <SectionEyebrow rulePosition="both">COMPREHENSIVE REDRESSAL</SectionEyebrow>
           <h2 className="text-2xl sm:text-4xl font-normal text-ink-navy tracking-tight font-serif">
             Supported Complaint Categories
@@ -430,31 +467,59 @@ export const LandingPage: React.FC = () => {
           <p className="text-xs sm:text-sm text-ink-muted font-sans">
             The Chief Proctor Office handles all campus concerns with dedicated department liaisons.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {CATEGORY_SHOWCASE.map((cat, idx) => {
             const Icon = cat.icon;
             return (
-              <div
+              <motion.div
                 key={idx}
-                className="group p-4 rounded-xl bg-paper-card border border-hairline shadow-sm hover:shadow-md hover:border-registrar-blue transition-all duration-150 flex flex-col items-center text-center gap-3 cursor-default"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.35,
+                  delay: (idx % 5) * 0.07,
+                  ease: MOTION_EASINGS.easeOutQuart,
+                }}
+                whileHover={
+                  prefersReducedMotion
+                    ? undefined
+                    : { y: -3, transition: { duration: 0.15, ease: MOTION_EASINGS.standardEase } }
+                }
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
               >
-                <div className="w-10 h-10 rounded-lg bg-paper-recessed border border-hairline text-registrar-blue flex items-center justify-center group-hover:bg-registrar-blue/10 transition-colors">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span className="text-xs sm:text-sm font-semibold text-ink-navy group-hover:text-registrar-blue transition-colors leading-tight">
-                  {cat.name}
-                </span>
-              </div>
+                <Link
+                  to={`/complaint?category=${encodeURIComponent(cat.name)}`}
+                  className="p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md transition-all group flex flex-col justify-between min-h-[140px] block shadow-sm"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-paper-recessed group-hover:bg-registrar-blue/10 flex items-center justify-center text-ink-navy group-hover:text-registrar-blue transition-colors mb-3">
+                    <Icon className="w-5 h-5" />
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-ink-navy text-xs sm:text-sm group-hover:text-registrar-blue transition-colors line-clamp-1">
+                      {cat.name}
+                    </h4>
+                    <p className="text-[10px] text-ink-muted mt-0.5 line-clamp-1 font-sans">
+                      {cat.liaison}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
             );
           })}
         </div>
       </section>
 
-      {/* 6. CTA Banner (ink-navy-card, rounded-2xl, contained) */}
+      {/* 6. CTA Banner (Scroll Reveal with subtle scale up) */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div
+        <motion.div
+          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.96, y: 24 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.45, ease: MOTION_EASINGS.easeOutQuart }}
           className="rounded-2xl bg-ink-navy-card text-white p-6 sm:p-10 border border-white/10 shadow-md relative overflow-hidden"
           style={{ backgroundColor: '#16234A' }}
         >
@@ -479,7 +544,7 @@ export const LandingPage: React.FC = () => {
               </Button>
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

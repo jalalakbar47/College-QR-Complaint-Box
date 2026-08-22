@@ -18,6 +18,11 @@ import { Select } from '../../components/ui/Select';
 import { Button } from '../../components/ui/Button';
 import { TableSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
+import { motion } from 'framer-motion';
+import {
+  createStaggerContainer,
+  staggerItemVariants,
+} from '../../lib/motion';
 
 const PAGE_SIZE = 15;
 
@@ -353,9 +358,14 @@ export const AdminActivityLogPage: React.FC = () => {
         </div>
       ) : (
         /* Timeline Container */
-        <div className="space-y-6">
+        <motion.div
+          variants={createStaggerContainer(0.04)}
+          initial="initial"
+          animate="animate"
+          className="space-y-6"
+        >
           {groupedLogs.map((group) => (
-            <div key={group.dateKey} className="space-y-3">
+            <motion.div variants={staggerItemVariants} key={group.dateKey} className="space-y-3">
               {/* Date Eyebrow Heading */}
               <div className="flex items-center gap-3">
                 <span className="font-mono text-xs font-semibold uppercase tracking-wider text-ink-muted bg-paper px-2.5 py-0.5 rounded border border-hairline">
@@ -441,7 +451,7 @@ export const AdminActivityLogPage: React.FC = () => {
                   })}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
 
           {/* 4. Pagination / Load More Button */}
@@ -458,7 +468,7 @@ export const AdminActivityLogPage: React.FC = () => {
               </Button>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

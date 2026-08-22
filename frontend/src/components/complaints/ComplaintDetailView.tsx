@@ -24,6 +24,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import { Admin, Complaint, ComplaintPriority, ComplaintStatus, UpdateComplaintDTO } from '../../types';
+import { motion } from 'framer-motion';
 import { Pill } from '../ui/Pill';
 import { Button } from '../ui/Button';
 import { Card, CardHeader } from '../ui/Card';
@@ -310,16 +311,28 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
 
                 return (
                   <div key={step.status} className="flex flex-col items-center text-center">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-semibold transition-colors ${
-                        isCurrent
-                          ? 'bg-seal-gold text-white ring-4 ring-seal-gold/20'
-                          : isPassed
-                          ? 'bg-registrar-blue text-white'
-                          : 'bg-white/5 text-slate-400 border border-white/20'
-                      }`}
-                    >
-                      {isPassed ? <Check className="w-3.5 h-3.5" /> : idx + 1}
+                    <div className="relative">
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-semibold relative overflow-hidden transition-colors ${
+                          isCurrent
+                            ? 'bg-seal-gold text-white ring-4 ring-seal-gold/20'
+                            : isPassed
+                            ? 'bg-registrar-blue text-white'
+                            : 'bg-white/5 text-slate-400 border border-white/20'
+                        }`}
+                      >
+                        {isCurrent && (
+                          <motion.div
+                            initial={{ width: '0%' }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 0.4, ease: 'linear' }}
+                            className="absolute inset-0 bg-seal-gold"
+                          />
+                        )}
+                        <span className="relative z-10">
+                          {isPassed ? <Check className="w-3.5 h-3.5" /> : idx + 1}
+                        </span>
+                      </div>
                     </div>
                     <span
                       className={`mt-1.5 text-xs font-medium ${
@@ -522,10 +535,13 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     if (st === 'Rejected') selectedStyle = 'bg-case-red text-white border-case-red shadow-sm';
 
                     return (
-                      <button
+                      <motion.button
                         type="button"
                         key={st}
                         onClick={() => setStatus(st)}
+                        whileTap={{ scale: 0.96 }}
+                        animate={isSelected ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+                        transition={{ duration: 0.25 }}
                         className={`px-3 py-2.5 rounded-lg text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 ${
                           isSelected
                             ? selectedStyle
@@ -537,7 +553,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                         {st === 'New' && <Sparkles className="w-3.5 h-3.5" />}
                         {st === 'Rejected' && <AlertTriangle className="w-3.5 h-3.5" />}
                         <span>{st}</span>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -557,10 +573,13 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                     if (pr === 'Critical') selectedStyle = 'bg-case-red text-white border-case-red shadow-sm';
 
                     return (
-                      <button
+                      <motion.button
                         type="button"
                         key={pr}
                         onClick={() => setPriority(pr)}
+                        whileTap={{ scale: 0.96 }}
+                        animate={isSelected ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+                        transition={{ duration: 0.25 }}
                         className={`py-2 px-1 rounded-lg text-[11px] font-medium border transition-colors text-center ${
                           isSelected
                             ? selectedStyle
@@ -569,7 +588,7 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                       >
                         {pr === 'Critical' && <Flame className="w-3 h-3 inline mr-1 text-seal-gold" />}
                         {pr}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -600,14 +619,15 @@ export const ComplaintDetailView: React.FC<ComplaintDetailViewProps> = ({
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {RESOLUTION_TEMPLATES.map((tmpl, idx) => (
-                      <button
+                      <motion.button
                         type="button"
                         key={idx}
                         onClick={() => handleApplyTemplate(tmpl)}
+                        whileTap={{ scale: 0.95 }}
                         className="text-[10px] text-ink-muted bg-paper-recessed hover:bg-registrar-blue/5 hover:text-registrar-blue hover:border-registrar-blue/30 px-2.5 py-1 rounded-lg border border-hairline transition-colors text-left"
                       >
                         + {tmpl.slice(0, 36)}...
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>

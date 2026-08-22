@@ -12,6 +12,11 @@ import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { apiService } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { motion } from 'framer-motion';
+import {
+  createStaggerContainer,
+  staggerItemVariants,
+} from '../../lib/motion';
 
 export interface ComplaintTableProps {
   complaints: Complaint[];
@@ -77,17 +82,23 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
 
   return (
     <>
-      {/* Mobile Card Layout (< 768px): Compact TicketStub cards */}
-      <div className="grid grid-cols-1 gap-3.5 md:hidden">
+      {/* Mobile Card Layout (< 768px): Compact TicketStub cards with Stagger */}
+      <motion.div
+        variants={createStaggerContainer(0.04)}
+        initial="initial"
+        animate="animate"
+        className="grid grid-cols-1 gap-3.5 md:hidden"
+      >
         {complaints.map((c) => (
-          <ComplaintCard
-            key={c.complaint_id}
-            complaint={c}
-            isAdmin={true}
-            onDelete={() => setDeletingComplaint(c)}
-          />
+          <motion.div key={c.complaint_id} variants={staggerItemVariants}>
+            <ComplaintCard
+              complaint={c}
+              isAdmin={true}
+              onDelete={() => setDeletingComplaint(c)}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Desktop Table View (>= 768px) with 3-Level Elevation & Distinct Borders */}
       <div className="hidden md:block w-full overflow-x-auto rounded-xl border border-hairline bg-paper-card shadow-sm">
@@ -202,8 +213,9 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                         <span>View</span>
                       </Link>
 
-                      <button
+                      <motion.button
                         type="button"
+                        whileTap={{ scale: 0.95 }}
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeletingComplaint(c);
@@ -212,7 +224,7 @@ export const ComplaintTable: React.FC<ComplaintTableProps> = ({
                         title="Delete Complaint"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      </motion.button>
                     </div>
                   </TableCell>
                 </TableRow>

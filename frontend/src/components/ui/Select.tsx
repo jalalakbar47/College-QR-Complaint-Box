@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react';
+import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { usePrefersReducedMotion, inputErrorShakeTransition, inputShakeKeyframes } from '../../lib/motion';
 
 export interface SelectOption {
   value: string;
@@ -33,6 +35,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const prefersReducedMotion = usePrefersReducedMotion();
 
     return (
       <div className="w-full">
@@ -42,14 +45,20 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             {requiredIndicator && <span className="text-case-red ml-1 font-bold">*</span>}
           </label>
         )}
-        <div className="relative rounded-lg shadow-subtle">
+
+        <motion.div
+          animate={error && !prefersReducedMotion ? { x: inputShakeKeyframes } : { x: 0 }}
+          transition={inputErrorShakeTransition}
+          className="relative rounded-lg shadow-subtle"
+        >
           <select
             id={selectId}
             ref={ref}
-            className={`block w-full appearance-none rounded-lg border bg-paper-card text-ink-navy text-sm px-3.5 py-2.5 pr-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed cursor-pointer min-h-[44px] ${error
-                ? 'border-case-red/50 focus:border-case-red focus:ring-case-red/20 text-case-red bg-case-red/5'
+            className={`block w-full appearance-none rounded-lg border bg-paper-recessed text-ink-navy text-sm px-3.5 py-2.5 pr-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-registrar-blue focus:border-registrar-blue focus:bg-white disabled:bg-paper disabled:text-ink-muted disabled:cursor-not-allowed cursor-pointer min-h-[44px] ${
+              error
+                ? 'border-case-red/60 focus:border-case-red focus:ring-case-red/20 text-case-red bg-case-red/5'
                 : 'border-hairline hover:border-ink-muted/40'
-              } ${className}`}
+            } ${className}`}
             {...props}
           >
             {placeholder && (
@@ -64,12 +73,21 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
             {children}
           </select>
+
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-ink-muted">
             <ChevronDown className="w-4 h-4" />
           </div>
-        </div>
+        </motion.div>
+
         {error ? (
-          <p className="mt-1.5 text-xs text-case-red font-medium">{error}</p>
+          <motion.p
+            initial={{ opacity: 0, y: -2 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15 }}
+            className="mt-1.5 text-xs text-case-red font-medium"
+          >
+            {error}
+          </motion.p>
         ) : helperText ? (
           <p className="mt-1.5 text-xs text-ink-muted">{helperText}</p>
         ) : null}
