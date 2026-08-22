@@ -105,13 +105,19 @@ export const LandingPage: React.FC = () => {
         className="relative overflow-hidden bg-ink-navy text-white pt-14 pb-20 sm:pt-20 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-ink-navy"
         style={{ backgroundColor: '#101B36' }}
       >
-        {/* Campus Background Image with Increased Opacity & Balanced ink-navy Overlay */}
+        {/* Campus Background Image with WebP Optimization & Smooth Fade-in */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <img
-            src="/background.jpeg"
-            alt="GPGC Khar District Bajaur Campus Background"
-            className="w-full h-full object-cover object-center opacity-55 scale-105"
-          />
+          <picture>
+            <source srcSet="/background.webp" type="image/webp" />
+            <img
+              src="/background.jpeg"
+              alt="GPGC Khar District Bajaur Campus Background"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              className="w-full h-full object-cover object-center opacity-55 scale-105 transition-opacity duration-500"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-ink-navy/75 via-ink-navy/65 to-ink-navy/95" />
           <div className="absolute inset-0 bg-dots-pattern opacity-5" />
         </div>
