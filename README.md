@@ -1,12 +1,11 @@
 # 🏛️ College QR Complaint Box — v2.1.0
 
-[![React 18](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Google Apps Script](https://img.shields.io/badge/Backend-Google_Apps_Script-4285F4?logo=google&logoColor=white)](https://developers.google.com/apps-script)
-[![Google Sheets](https://img.shields.io/badge/Database-Google_Sheets-34A853?logo=google-sheets&logoColor=white)](https://sheets.google.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Primary language: TypeScript](https://img.shields.io/github/languages/top/jalalakbar47/College-QR-Complaint-Box?style=flat-square&logo=typescript&logoColor=white)](https://github.com/jalalakbar47/College-QR-Complaint-Box/search?l=TypeScript)
+[![GitHub stars](https://img.shields.io/github/stars/jalalakbar47/College-QR-Complaint-Box?style=flat-square)](https://github.com/jalalakbar47/College-QR-Complaint-Box/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/jalalakbar47/College-QR-Complaint-Box?style=flat-square)](https://github.com/jalalakbar47/College-QR-Complaint-Box/network/members)
+[![Open issues](https://img.shields.io/github/issues/jalalakbar47/College-QR-Complaint-Box?style=flat-square)](https://github.com/jalalakbar47/College-QR-Complaint-Box/issues)
+[![Last commit](https://img.shields.io/github/last-commit/jalalakbar47/College-QR-Complaint-Box?style=flat-square)](https://github.com/jalalakbar47/College-QR-Complaint-Box/commits/main)
+[![Live deployment](https://img.shields.io/website?style=flat-square&label=Live%20Deployment&url=https%3A%2F%2Fcollege-qr-complaint-box.vercel.app%2F)](https://college-qr-complaint-box.vercel.app/)
 
 An institutional-grade, mobile-first, and serverless **Student Grievance Redressal & QR Complaint System** built for modern colleges, universities, and polytechnics.
 
