@@ -233,7 +233,7 @@ npm run build
 
 **Jalaluddin Khan** ([@jalalakbar47](https://github.com/jalalakbar47))  
 *Software Developer • BS Computer Science *
-- **UNiversity**:University Of Malakand
+- **University**: University Of Malakand
 
 - **GitHub**: [@jalalakbar47](https://github.com/jalalakbar47)
 - **LinkedIn**: [linkedin.com/in/jalalakbar47](https://linkedin.com/in/jalalakbar47)
