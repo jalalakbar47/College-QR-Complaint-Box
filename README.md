@@ -232,7 +232,8 @@ npm run build
 ## 👨‍💻 Author & Developer
 
 **Jalaluddin Khan** ([@jalalakbar47](https://github.com/jalalakbar47))  
-*Software Developer • BS Computer Science*
+*Software Developer • BS Computer Science • University Of Malakand*
+*Government Post Graduate College (GPGC) Khar, District Bajaur*
 
 - **GitHub**: [@jalalakbar47](https://github.com/jalalakbar47)
 - **LinkedIn**: [linkedin.com/in/jalalakbar47](https://linkedin.com/in/jalalakbar47)
