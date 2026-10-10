@@ -223,7 +223,7 @@ export const AdminLocationsPage: React.FC = () => {
       {/* Screen Layout - Hidden during printing */}
       <div className="space-y-6 sm:space-y-8 animate-fade-in no-print">
         {/* 1. Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center justify-between gap-3">
           <div>
             <h1 className="font-serif text-xl sm:text-2xl font-normal text-ink-navy tracking-tight">
               Campus Locations
@@ -238,9 +238,10 @@ export const AdminLocationsPage: React.FC = () => {
             size="sm"
             onClick={openAddModal}
             leftIcon={<Plus className="w-4 h-4" />}
-            className="shadow-sm text-xs font-medium px-4"
+            className="shadow-sm text-xs font-medium px-3 sm:px-4 flex-shrink-0 whitespace-nowrap"
           >
-            + Add Location
+            <span className="hidden sm:inline">+ Add Location</span>
+            <span className="sm:hidden">+ Location</span>
           </Button>
         </div>
 

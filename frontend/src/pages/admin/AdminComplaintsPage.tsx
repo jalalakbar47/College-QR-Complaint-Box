@@ -80,7 +80,7 @@ export const AdminComplaintsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="font-serif text-xl sm:text-2xl font-normal text-ink-navy tracking-tight">
             Complaint Records Repository
@@ -96,8 +96,8 @@ export const AdminComplaintsPage: React.FC = () => {
             size="sm"
             onClick={refetch}
             disabled={isLoading}
-            leftIcon={<RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />}
-            className="text-xs"
+            leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />}
+            className="text-xs shadow-2xs whitespace-nowrap"
           >
             Refresh
           </Button>

@@ -107,6 +107,7 @@ export const apiService = {
             student_name: dto.student_name,
           }
         );
+        broadcastDataChanged('COMPLAINT_CREATED', res.data.complaint_id);
       }
       return res;
     }
@@ -138,6 +139,7 @@ export const apiService = {
     saveLocalComplaints([newComplaint, ...currentList]);
 
     broadcastNewComplaint(newComplaint);
+    broadcastDataChanged('COMPLAINT_CREATED', complaintId);
 
     return {
       success: true,
@@ -382,12 +384,16 @@ export const apiService = {
    */
   async updateComplaint(dto: UpdateComplaintDTO, token?: string): Promise<ApiResponse<Complaint>> {
     if (ENV.IS_LIVE_API_CONFIGURED) {
-      return callGasApi(ENV.API_URL, {
+      const res = await callGasApi<Complaint>(ENV.API_URL, {
         method: 'POST',
         action: 'updateComplaint',
         data: dto,
         token,
       });
+      if (res.success) {
+        broadcastDataChanged('COMPLAINT_UPDATED', dto.complaint_id);
+      }
+      return res;
     }
 
     await new Promise((r) => setTimeout(r, 500));

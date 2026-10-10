@@ -100,7 +100,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             {title}
           </h1>
           <p className="hidden sm:block font-mono text-[10px] sm:text-[11px] text-ink-muted uppercase tracking-wider">
-            {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
+            {ENV.COLLEGE_NAME || 'Office of the Chief Proctor'}
           </p>
         </div>
       </div>
@@ -128,141 +128,150 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
           {/* Flyout Notification Panel */}
           {isOpen && (
-            <div className="absolute -right-2 sm:right-0 mt-2.5 w-[calc(100vw-32px)] max-w-sm sm:w-96 bg-paper-card rounded-xl shadow-lg border border-hairline overflow-hidden z-50 animate-fade-in">
-              {/* Header */}
-              <div className="px-4 py-3 bg-ink-navy text-white flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">Complaint Alerts</span>
-                  {unreadCount > 0 && (
-                    <span className="text-[10px] font-mono font-bold bg-case-red text-white px-2 py-0.5 rounded-full">
-                      {unreadCount} New
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {/* Sound Toggle */}
-                  <button
-                    onClick={() => setSoundEnabled(!soundEnabled)}
-                    className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-                    title={soundEnabled ? 'Mute Alert Chime' : 'Unmute Alert Chime'}
-                  >
-                    {soundEnabled ? <Volume2 className="w-4 h-4 text-ledger-green" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
-                  </button>
+            <>
+              {/* Mobile Backdrop Overlay */}
+              <div
+                className="fixed inset-0 bg-ink-navy/40 backdrop-blur-xs z-40 sm:hidden animate-fade-in"
+                onClick={() => setIsOpen(false)}
+                aria-hidden="true"
+              />
 
-                  {/* Desktop Notification Request */}
-                  {desktopPermission !== 'granted' && (
-                    <button
-                      onClick={requestDesktopPermission}
-                      className="p-1.5 rounded-lg text-seal-gold hover:text-white hover:bg-white/10 transition-colors"
-                      title="Enable Desktop Push Alerts"
-                    >
-                      <BellRing className="w-4 h-4" />
-                    </button>
-                  )}
-
-                  {/* Mark All Read */}
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-                      title="Mark all as read"
-                    >
-                      <CheckCheck className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Real-time Status Bar */}
-              <div className="px-4 py-2 bg-paper border-b border-hairline flex items-center justify-between text-[11px] text-ink-muted">
-                <span className="flex items-center gap-1.5 font-medium text-ink-navy">
-                  <span className="w-2 h-2 rounded-full bg-ledger-green animate-pulse inline-block" />
-                  Live complaint sync active
-                </span>
-                <span className="text-[10px] font-mono text-ink-muted">12s auto-refresh</span>
-              </div>
-
-              {/* Notification List */}
-              <div className="max-h-80 overflow-y-auto divide-y divide-hairline">
-                {notifications.length === 0 ? (
-                  <div className="p-8 text-center text-ink-muted">
-                    <ShieldAlert className="w-8 h-8 mx-auto mb-2 text-ink-muted/50 stroke-1" />
-                    <p className="text-xs font-semibold text-ink-navy">All caught up!</p>
-                    <p className="text-[11px] text-ink-muted mt-0.5">No complaint alerts recorded yet.</p>
+              <div className="fixed inset-x-3.5 top-[68px] sm:top-full sm:inset-x-auto sm:absolute sm:right-0 sm:mt-2.5 sm:w-96 max-w-none sm:max-w-sm bg-paper-card rounded-2xl sm:rounded-xl shadow-2xl sm:shadow-lg border border-hairline overflow-hidden z-50 animate-fade-in">
+                {/* Header */}
+                <div className="px-4 py-3 bg-ink-navy text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm">Complaint Alerts</span>
+                    {unreadCount > 0 && (
+                      <span className="text-[10px] font-mono font-bold bg-case-red text-white px-2 py-0.5 rounded-full">
+                        {unreadCount} New
+                      </span>
+                    )}
                   </div>
-                ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      onClick={() => handleNotificationClick(n.complaint_id, n.id)}
-                      className={`p-3.5 transition-colors cursor-pointer hover:bg-paper flex items-start gap-3 ${
-                        !n.is_read ? 'bg-registrar-blue/5' : ''
-                      }`}
+                  <div className="flex items-center gap-1">
+                    {/* Sound Toggle */}
+                    <button
+                      onClick={() => setSoundEnabled(!soundEnabled)}
+                      className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                      title={soundEnabled ? 'Mute Alert Chime' : 'Unmute Alert Chime'}
                     >
-                      <div className="mt-0.5 flex-shrink-0">
-                        {!n.is_read ? (
-                          <span className="w-2.5 h-2.5 rounded-full bg-registrar-blue inline-block ring-4 ring-registrar-blue/15" />
-                        ) : (
-                          <span className="w-2.5 h-2.5 rounded-full bg-hairline inline-block" />
-                        )}
-                      </div>
+                      {soundEnabled ? <Volume2 className="w-4 h-4 text-ledger-green" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                    </button>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <Pill
-                            variant={getPriorityPillVariant(n.priority) as any}
-                            size="sm"
-                            label={n.priority}
-                          />
-                          <span className="text-[10px] font-semibold text-ink-muted truncate max-w-[120px]">
-                            {n.category}
-                          </span>
-                          <span className="ml-auto text-[10px] font-mono text-ink-muted flex items-center gap-0.5 whitespace-nowrap">
-                            <Clock className="w-2.5 h-2.5" />
-                            {formatRelativeTime(n.timestamp)}
-                          </span>
-                        </div>
+                    {/* Desktop Notification Request */}
+                    {desktopPermission !== 'granted' && (
+                      <button
+                        onClick={requestDesktopPermission}
+                        className="p-1.5 rounded-lg text-seal-gold hover:text-white hover:bg-white/10 transition-colors"
+                        title="Enable Desktop Push Alerts"
+                      >
+                        <BellRing className="w-4 h-4" />
+                      </button>
+                    )}
 
-                        <p className="text-xs font-semibold text-ink-navy line-clamp-1 leading-snug">{n.title}</p>
+                    {/* Mark All Read */}
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllAsRead}
+                        className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                        title="Mark all as read"
+                      >
+                        <CheckCheck className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-                        <div className="flex items-center justify-between text-[11px] text-ink-muted mt-1">
-                          <span className="flex items-center gap-1 truncate">
-                            <MapPin className="w-2.5 h-2.5 text-ink-muted flex-shrink-0" />
-                            <span className="truncate">{n.location}</span>
-                          </span>
-                          <span className="font-mono text-[10px] font-semibold text-registrar-blue flex-shrink-0">
-                            {n.complaint_id}
-                          </span>
-                        </div>
-                      </div>
+                {/* Real-time Status Bar */}
+                <div className="px-4 py-2 bg-paper border-b border-hairline flex items-center justify-between text-[11px] text-ink-muted">
+                  <span className="flex items-center gap-1.5 font-medium text-ink-navy">
+                    <span className="w-2 h-2 rounded-full bg-ledger-green animate-pulse inline-block" />
+                    Live sync active
+                  </span>
+                  <span className="text-[10px] font-mono text-ink-muted">12s auto-refresh</span>
+                </div>
 
-                      <ChevronRight className="w-4 h-4 text-ink-muted self-center flex-shrink-0" />
+                {/* Notification List */}
+                <div className="max-h-[calc(100vh-230px)] sm:max-h-80 overflow-y-auto divide-y divide-hairline">
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center text-ink-muted">
+                      <ShieldAlert className="w-8 h-8 mx-auto mb-2 text-ink-muted/50 stroke-1" />
+                      <p className="text-xs font-semibold text-ink-navy">All caught up!</p>
+                      <p className="text-[11px] text-ink-muted mt-0.5">No complaint alerts recorded yet.</p>
                     </div>
-                  ))
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        onClick={() => handleNotificationClick(n.complaint_id, n.id)}
+                        className={`p-3 sm:p-3.5 transition-colors cursor-pointer hover:bg-paper flex items-start gap-3 ${
+                          !n.is_read ? 'bg-registrar-blue/5' : ''
+                        }`}
+                      >
+                        <div className="mt-0.5 flex-shrink-0">
+                          {!n.is_read ? (
+                            <span className="w-2.5 h-2.5 rounded-full bg-registrar-blue inline-block ring-4 ring-registrar-blue/15" />
+                          ) : (
+                            <span className="w-2.5 h-2.5 rounded-full bg-hairline inline-block" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <Pill
+                              variant={getPriorityPillVariant(n.priority) as any}
+                              size="sm"
+                              label={n.priority}
+                            />
+                            <span className="text-[10px] font-semibold text-ink-muted truncate max-w-[110px] sm:max-w-[130px]">
+                              {n.category}
+                            </span>
+                            <span className="ml-auto text-[10px] font-mono text-ink-muted flex items-center gap-0.5 whitespace-nowrap">
+                              <Clock className="w-2.5 h-2.5" />
+                              {formatRelativeTime(n.timestamp)}
+                            </span>
+                          </div>
+
+                          <p className="text-xs font-semibold text-ink-navy line-clamp-1 leading-snug">{n.title}</p>
+
+                          <div className="flex items-center justify-between text-[11px] text-ink-muted mt-1">
+                            <span className="flex items-center gap-1 truncate pr-2">
+                              <MapPin className="w-2.5 h-2.5 text-ink-muted flex-shrink-0" />
+                              <span className="truncate">{n.location}</span>
+                            </span>
+                            <span className="font-mono text-[10px] font-semibold text-registrar-blue flex-shrink-0">
+                              {n.complaint_id}
+                            </span>
+                          </div>
+                        </div>
+
+                        <ChevronRight className="w-4 h-4 text-ink-muted self-center flex-shrink-0" />
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Footer Actions */}
+                {notifications.length > 0 && (
+                  <div className="p-2.5 bg-paper border-t border-hairline flex items-center justify-between text-xs">
+                    <button
+                      onClick={clearAll}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-ink-muted hover:text-case-red transition-colors px-2 py-1 rounded"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Clear list</span>
+                    </button>
+
+                    <Link
+                      to="/admin/complaints"
+                      onClick={() => setIsOpen(false)}
+                      className="font-medium text-registrar-blue hover:underline text-[11px] px-2 py-1"
+                    >
+                      View repository →
+                    </Link>
+                  </div>
                 )}
               </div>
-
-              {/* Footer Actions */}
-              {notifications.length > 0 && (
-                <div className="p-2.5 bg-paper border-t border-hairline flex items-center justify-between text-xs">
-                  <button
-                    onClick={clearAll}
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-ink-muted hover:text-case-red transition-colors px-2 py-1 rounded"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    <span>Clear list</span>
-                  </button>
-
-                  <Link
-                    to="/admin/complaints"
-                    onClick={() => setIsOpen(false)}
-                    className="font-medium text-registrar-blue hover:underline text-[11px] px-2 py-1"
-                  >
-                    View repository →
-                  </Link>
-                </div>
-              )}
-            </div>
+            </>
           )}
         </div>
 

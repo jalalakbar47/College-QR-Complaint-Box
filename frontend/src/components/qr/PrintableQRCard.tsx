@@ -24,7 +24,7 @@ export const PrintableQRCard: React.FC<PrintableQRCardProps> = ({
           <ShieldCheck className="w-10 h-10 text-seal-gold" />
         </div>
         <h2 className="poster-title font-serif text-2xl sm:text-3xl font-bold text-ink-navy leading-tight text-center tracking-tight max-w-xl">
-          {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
+          {ENV.COLLEGE_NAME}
         </h2>
         <p className="poster-subtitle font-mono text-xs uppercase tracking-widest text-registrar-blue font-bold mt-1.5">
           Office of the Chief Proctor • Student Grievance Cell

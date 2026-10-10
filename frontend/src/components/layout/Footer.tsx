@@ -123,14 +123,14 @@ export const Footer: React.FC = () => {
                   Student Affairs &amp; Discipline Cell
                 </p>
                 <p className="text-[11px] text-ink-muted leading-snug font-sans">
-                  {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
+                  {ENV.COLLEGE_NAME}
                 </p>
               </div>
             </div>
 
             <div className="pt-2 border-t border-hairline flex items-center gap-2 text-xs font-medium text-ink-navy">
               <PhoneCall className="w-3.5 h-3.5 text-registrar-blue flex-shrink-0" />
-              <span>Helpline: Proctor Office GPGC Khar District Bajaur</span>
+              <span>Helpline: {ENV.COLLEGE_SHORT_NAME || 'Campus'} Proctor Office</span>
             </div>
           </div>
         </div>

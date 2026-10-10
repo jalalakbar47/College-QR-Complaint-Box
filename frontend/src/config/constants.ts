@@ -37,16 +37,19 @@ export const INITIAL_LOCATIONS: LocationItem[] = [
 ];
 
 export const DEPARTMENTS = [
-  'Computer Science & Engineering',
+  'Computer Science',
   'Information Technology',
   'Electronics & Communication',
   'Mechanical Engineering',
   'Civil Engineering',
   'Electrical Engineering',
+  'Mathematics',
+  'Physics',
+  'Chemistry',
+  'Botany',
+  'Zoology',
+  'English',
   'Business Administration (MBA/BBA)',
-  'Applied Sciences & Humanities',
-  'Pharmacy / Allied Health',
-  'Other',
 ];
 
 export const SEMESTERS = ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4', 'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8'];

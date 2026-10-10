@@ -79,7 +79,7 @@ export const AdminLoginPage: React.FC = () => {
           {/* Institutional Title & Subtitle */}
           <div className="text-center mb-6">
             <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-ink-muted font-medium block mb-1">
-              {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
+              {ENV.COLLEGE_NAME}
             </span>
             <h1 className="font-serif text-2xl sm:text-3xl font-normal text-ink-navy tracking-tight mb-1">
               Chief Proctor Panel

@@ -154,6 +154,32 @@ export const AdminActivityLogPage: React.FC = () => {
 
   useEffect(() => {
     fetchLogs(false);
+
+    let bcMutations: BroadcastChannel | null = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bcMutations = new BroadcastChannel('cqb_mutations_channel');
+        bcMutations.onmessage = () => fetchLogs(false);
+      }
+    } catch {
+      // BroadcastChannel fallback
+    }
+
+    const handleDataChanged = () => fetchLogs(false);
+    window.addEventListener('cqb_data_changed', handleDataChanged);
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'cqb_data_mutation_ping' || e.key === 'activity_logs_db') {
+        fetchLogs(false);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (bcMutations) bcMutations.close();
+      window.removeEventListener('cqb_data_changed', handleDataChanged);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [fetchLogs]);
 
   // Filtered logs
@@ -232,7 +258,7 @@ export const AdminActivityLogPage: React.FC = () => {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-serif text-xl sm:text-2xl font-normal text-ink-navy tracking-tight">
             Activity Log
@@ -248,9 +274,10 @@ export const AdminActivityLogPage: React.FC = () => {
           onClick={() => fetchLogs(true)}
           disabled={isLoading}
           leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />}
-          className="text-xs font-medium"
+          className="text-xs font-medium flex-shrink-0 shadow-2xs whitespace-nowrap"
         >
-          Refresh Audit Trail
+          <span className="hidden sm:inline">Refresh Audit Trail</span>
+          <span className="sm:hidden">Refresh</span>
         </Button>
       </div>
 

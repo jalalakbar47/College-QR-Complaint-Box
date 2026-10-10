@@ -269,7 +269,7 @@ export const AdminCategoriesPage: React.FC = () => {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-serif text-xl sm:text-2xl font-normal text-ink-navy tracking-tight">
             Complaint Categories
@@ -284,9 +284,10 @@ export const AdminCategoriesPage: React.FC = () => {
           size="sm"
           onClick={openAddModal}
           leftIcon={<Plus className="w-4 h-4" />}
-          className="shadow-sm text-xs font-medium px-4"
+          className="shadow-sm text-xs font-medium px-3 sm:px-4 flex-shrink-0 whitespace-nowrap"
         >
-          + Add Category
+          <span className="hidden sm:inline">+ Add Category</span>
+          <span className="sm:hidden">+ Category</span>
         </Button>
       </div>
 

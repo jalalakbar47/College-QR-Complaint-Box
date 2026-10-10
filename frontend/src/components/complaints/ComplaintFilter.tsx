@@ -69,8 +69,8 @@ export const ComplaintFilter: React.FC<ComplaintFilterProps> = ({
         />
       </div>
 
-      {/* Row 2: 4 Select Dropdowns Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Row 2: 4 Select Dropdowns Grid (2x2 on mobile, 4-across on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {/* Status Filter */}
         <Select
           value={filters.status}

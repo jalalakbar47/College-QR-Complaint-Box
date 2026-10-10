@@ -50,9 +50,71 @@ export function useComplaints(options: UseComplaintsOptions = {}) {
   }, [options.search, options.status, options.priority, options.category, options.location, options.department, token]);
 
   useEffect(() => {
-    if (options.autoFetch !== false) {
-      fetchComplaints(!hasLoadedRef.current);
+    if (options.autoFetch === false) return;
+
+    fetchComplaints(!hasLoadedRef.current);
+
+    // 1. Cross-tab BroadcastChannel listener for mutations & new complaints
+    let bcMutations: BroadcastChannel | null = null;
+    let bcNotifs: BroadcastChannel | null = null;
+
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bcMutations = new BroadcastChannel('cqb_mutations_channel');
+        bcMutations.onmessage = () => {
+          fetchComplaints(false);
+        };
+
+        bcNotifs = new BroadcastChannel('cqb_notifications_channel');
+        bcNotifs.onmessage = () => {
+          fetchComplaints(false);
+        };
+      }
+    } catch {
+      // BroadcastChannel unsupported fallback
     }
+
+    // 2. In-tab custom window events
+    const handleDataChanged = () => fetchComplaints(false);
+    const handleComplaintLogged = () => fetchComplaints(false);
+
+    window.addEventListener('cqb_data_changed', handleDataChanged);
+    window.addEventListener('cqb_complaint_logged', handleComplaintLogged);
+
+    // 3. Cross-tab storage change fallback
+    const handleStorage = (e: StorageEvent) => {
+      if (
+        e.key === 'cqb_data_mutation_ping' ||
+        e.key === 'cqb_last_submitted_ping' ||
+        e.key === 'complaints_db'
+      ) {
+        fetchComplaints(false);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // 4. Tab visibility change (refresh immediately when user switches back)
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        fetchComplaints(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // 5. Periodic polling (every 12 seconds)
+    const pollInterval = setInterval(() => {
+      fetchComplaints(false);
+    }, 12000);
+
+    return () => {
+      if (bcMutations) bcMutations.close();
+      if (bcNotifs) bcNotifs.close();
+      window.removeEventListener('cqb_data_changed', handleDataChanged);
+      window.removeEventListener('cqb_complaint_logged', handleComplaintLogged);
+      window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearInterval(pollInterval);
+    };
   }, [fetchComplaints, options.autoFetch]);
 
   return {

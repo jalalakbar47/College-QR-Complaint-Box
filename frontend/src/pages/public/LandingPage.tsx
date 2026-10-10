@@ -158,8 +158,8 @@ export const LandingPage: React.FC = () => {
           {/* Institution Eyebrow Pill on Dark Background */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs max-w-full">
             <ShieldCheck className="w-3.5 h-3.5 text-seal-gold flex-shrink-0" />
-            <span className="hidden sm:inline">{ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}</span>
-            <span className="sm:hidden">{ENV.COLLEGE_SHORT_NAME || 'GPGC Khar District Bajaur'}</span>
+            <span className="hidden sm:inline">{ENV.COLLEGE_NAME}</span>
+            <span className="sm:hidden">{ENV.COLLEGE_SHORT_NAME}</span>
           </div>
 
           {/* H1 in Fraunces */}

@@ -58,10 +58,10 @@ export const AdminSettingsPage: React.FC = () => {
 
   // Institution Details State
   const [collegeName, setCollegeName] = useState<string>(
-    ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'
+    ENV.COLLEGE_NAME || 'Office of the Chief Proctor'
   );
   const [officeName, setOfficeName] = useState<string>('Office of the Chief Proctor');
-  const [helplineExt, setHelplineExt] = useState<string>('+92 942 220033 / Ext. 104');
+  const [helplineExt, setHelplineExt] = useState<string>('+92 000 000000 / Ext. 104');
 
   // Admin Account & Password State
   const [adminEmail, setAdminEmail] = useState<string>(admin?.email || 'chiefproctor@college.edu');

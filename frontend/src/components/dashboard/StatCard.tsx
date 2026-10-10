@@ -154,21 +154,25 @@ export const StatCard: React.FC<StatCardProps> = ({
           ? { scale: 0.99, transition: { duration: 0.1 } }
           : undefined
       }
-      className={`rounded-xl border p-4 sm:p-5 shadow-sm transition-colors duration-150 flex items-center justify-between bg-paper-card ${criticalClass} ${
+      className={`rounded-xl border p-3.5 sm:p-5 shadow-sm transition-colors duration-150 flex items-center justify-between bg-paper-card ${criticalClass} ${
         onClick ? 'cursor-pointer hover:shadow-md' : ''
       }`}
     >
-      <div className="min-w-0 pr-3">
-        <span className="text-xs font-mono uppercase tracking-wider text-ink-muted block mb-1 truncate">
+      <div className="min-w-0 pr-2 sm:pr-3 flex-1">
+        <span className="text-[10px] sm:text-xs font-mono uppercase tracking-wider text-ink-muted block mb-0.5 sm:mb-1 truncate font-medium">
           {label}
         </span>
-        <h3 className="text-2xl sm:text-3xl font-serif font-normal text-ink-navy tracking-tight">
+        <h3 className="text-xl sm:text-2xl lg:text-3xl font-serif font-normal text-ink-navy tracking-tight">
           <CountUpDisplay value={value} />
         </h3>
-        {subtitle && <p className="text-[11px] text-ink-muted mt-1 truncate">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-[10px] sm:text-[11px] text-ink-muted mt-0.5 sm:mt-1 truncate">
+            {subtitle}
+          </p>
+        )}
       </div>
 
-      <div className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 shadow-2xs ${style.iconBg}`}>
+      <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center flex-shrink-0 shadow-2xs ${style.iconBg}`}>
         {icon}
       </div>
     </motion.div>
