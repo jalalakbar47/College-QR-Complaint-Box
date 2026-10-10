@@ -141,7 +141,7 @@ export const LandingPage: React.FC = () => {
               alt="GPGC Khar District Bajaur Campus Background"
               loading="eager"
               decoding="async"
-              fetchPriority="high"
+              {...({ fetchpriority: 'high' } as any)}
               className="w-full h-full object-cover object-center opacity-55 scale-105 transition-opacity duration-500"
             />
           </picture>
@@ -156,19 +156,20 @@ export const LandingPage: React.FC = () => {
           className="relative max-w-5xl mx-auto text-center space-y-6 z-10"
         >
           {/* Institution Eyebrow Pill on Dark Background */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs font-mono tracking-wide backdrop-blur-xs max-w-full">
             <ShieldCheck className="w-3.5 h-3.5 text-seal-gold flex-shrink-0" />
-            <span className="truncate">{ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}</span>
+            <span className="hidden sm:inline">{ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}</span>
+            <span className="sm:hidden">{ENV.COLLEGE_SHORT_NAME || 'GPGC Khar District Bajaur'}</span>
           </div>
 
           {/* H1 in Fraunces */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white leading-[1.14] font-serif max-w-4xl mx-auto">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-white leading-[1.18] sm:leading-[1.14] font-serif max-w-4xl mx-auto">
             Fast, Confidential &amp; Accountable <br className="hidden sm:inline" />
             <span className="text-seal-gold font-medium">Campus Issue Reporting</span>
           </h1>
 
           {/* Supporting Paragraph */}
-          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-xs sm:text-base text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
             Empowering students with a direct, confidential channel to the <strong className="text-white font-medium">Chief Proctor Office</strong>. Submit academic, infrastructure, or safety concerns with guaranteed privacy and live resolution tracking.
           </p>
 
@@ -178,7 +179,7 @@ export const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                className="w-full sm:w-auto font-medium py-3.5 px-6 shadow-sm"
+                className="w-full sm:w-auto font-medium py-3.5 px-6 shadow-sm min-h-[44px]"
                 leftIcon={<PlusCircle className="w-5 h-5" />}
               >
                 Submit a Complaint
@@ -189,7 +190,7 @@ export const LandingPage: React.FC = () => {
               <Button
                 variant="secondary"
                 size="lg"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border-white/30 backdrop-blur-xs font-medium py-3.5 px-6"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border-white/30 backdrop-blur-xs font-medium py-3.5 px-6 min-h-[44px]"
                 leftIcon={<Search className="w-5 h-5 text-slate-300" />}
               >
                 Track Existing Complaint
@@ -200,13 +201,13 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 2. Trust Strip (4 items, floating card row overlapping hero with Scroll Stagger) */}
-      <section className="-mt-10 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 relative z-20">
+      <section className="-mt-8 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.4, ease: MOTION_EASINGS.easeOutQuart }}
-          className="bg-paper-card rounded-xl border border-hairline shadow-sm p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+          className="bg-paper-card rounded-2xl border border-hairline shadow-sm p-3.5 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4"
         >
           {[
             { icon: CheckCircle2, iconColor: 'text-ledger-green', title: '100% Anonymous', subtitle: 'Zero identity logs' },
@@ -222,14 +223,14 @@ export const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.3, delay: i * 0.08, ease: MOTION_EASINGS.easeOutQuart }}
-                className="flex items-center gap-3 p-2.5 rounded-lg bg-paper-recessed border border-hairline hover:border-registrar-blue/30 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl bg-paper-recessed border border-hairline hover:border-registrar-blue/30 transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-ink-navy text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
                   <Icon className={`w-4 h-4 ${item.iconColor}`} />
                 </div>
                 <div className="min-w-0">
-                  <span className="font-semibold text-ink-navy text-xs sm:text-sm block truncate">{item.title}</span>
-                  <span className="text-[11px] text-ink-muted block truncate">{item.subtitle}</span>
+                  <span className="font-semibold text-ink-navy text-xs sm:text-sm block leading-snug">{item.title}</span>
+                  <span className="text-[11px] text-ink-muted block leading-tight mt-0.5">{item.subtitle}</span>
                 </div>
               </motion.div>
             );
@@ -377,20 +378,21 @@ export const LandingPage: React.FC = () => {
               >
                 <TicketStub
                   eyebrow="CAMPUS QR PLACARD"
-                  referenceId="Direct Mobile Submission"
+                  referenceId="Direct Submission QR"
                   statusPill={<Pill variant="new" size="sm" label="Scan to Submit" />}
                 >
                   <div className="flex flex-col items-center text-center">
                     {/* QR Code Container */}
                     <div
                       ref={qrRef}
-                      className="p-3 bg-white rounded-lg border border-hairline shadow-sm mb-3 flex items-center justify-center"
+                      className="p-3 bg-white rounded-xl border border-hairline shadow-sm mb-3 flex items-center justify-center max-w-[200px]"
                     >
                       <QRCodeSVG
                         value={portalComplaintUrl}
-                        size={180}
+                        size={170}
                         level="H"
                         includeMargin={false}
+                        className="w-full h-auto max-w-[170px]"
                       />
                     </div>
 
@@ -402,8 +404,8 @@ export const LandingPage: React.FC = () => {
                     </p>
 
                     {/* Target URL Chip */}
-                    <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper-recessed border border-hairline text-xs text-ink-muted font-mono my-3.5">
-                      <span className="truncate pr-2">{portalComplaintUrl}</span>
+                    <div className="w-full flex items-center justify-between p-2.5 rounded-lg bg-paper-recessed border border-hairline text-xs text-ink-muted font-mono my-3.5 gap-2">
+                      <span className="break-all text-left flex-1 text-[11px] sm:text-xs">{portalComplaintUrl}</span>
                       <a
                         href={portalComplaintUrl}
                         target="_blank"
@@ -416,11 +418,11 @@ export const LandingPage: React.FC = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2 w-full">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs py-2 min-h-[38px]"
                         onClick={handleCopyUrl}
                         leftIcon={
                           copied ? (
@@ -436,7 +438,7 @@ export const LandingPage: React.FC = () => {
                       <Button
                         variant="primary"
                         size="sm"
-                        className="flex-1 text-xs shadow-sm"
+                        className="flex-1 text-xs shadow-sm py-2 min-h-[38px]"
                         onClick={handleDownloadQr}
                         leftIcon={<Download className="w-3.5 h-3.5" />}
                       >
@@ -492,17 +494,17 @@ export const LandingPage: React.FC = () => {
               >
                 <Link
                   to={`/complaint?category=${encodeURIComponent(cat.name)}`}
-                  className="p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md transition-all group flex flex-col justify-between min-h-[140px] block shadow-sm"
+                  className="p-3.5 sm:p-4 rounded-xl bg-paper-card border border-hairline hover:border-registrar-blue hover:shadow-md transition-all group flex flex-col justify-between min-h-[144px] sm:min-h-[154px] block shadow-sm"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-paper-recessed group-hover:bg-registrar-blue/10 flex items-center justify-center text-ink-navy group-hover:text-registrar-blue transition-colors mb-3">
-                    <Icon className="w-5 h-5" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-paper-recessed group-hover:bg-registrar-blue/10 flex items-center justify-center text-ink-navy group-hover:text-registrar-blue transition-colors mb-2.5">
+                    <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-ink-navy text-xs sm:text-sm group-hover:text-registrar-blue transition-colors line-clamp-1">
+                    <h4 className="font-semibold text-ink-navy text-xs sm:text-sm group-hover:text-registrar-blue transition-colors leading-snug line-clamp-2">
                       {cat.name}
                     </h4>
-                    <p className="text-[10px] text-ink-muted mt-0.5 line-clamp-1 font-sans">
+                    <p className="text-[10px] sm:text-[11px] text-ink-muted mt-1 line-clamp-1 font-sans">
                       {cat.liaison}
                     </p>
                   </div>

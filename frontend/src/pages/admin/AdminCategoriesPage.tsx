@@ -341,14 +341,14 @@ export const AdminCategoriesPage: React.FC = () => {
                     {/* Category Title & Department Liaison Sub-line */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-ink-navy text-sm truncate">
+                        <h3 className="font-semibold text-ink-navy text-sm leading-snug">
                           {cat.category_name}
                         </h3>
                         <span className="font-mono text-[10px] text-ink-muted bg-paper-recessed px-1.5 py-0.5 rounded border border-hairline hidden md:inline-block">
                           {cat.category_id}
                         </span>
                       </div>
-                      <p className="text-xs text-ink-muted truncate mt-0.5 font-sans">
+                      <p className="text-xs text-ink-muted leading-tight mt-0.5 font-sans">
                         Department liaison:{' '}
                         <span className="text-ink-navy font-medium">{liaison}</span>
                       </p>
@@ -356,7 +356,7 @@ export const AdminCategoriesPage: React.FC = () => {
                   </div>
 
                   {/* Right Side: Active/Inactive Toggle Switch + Edit & Delete Buttons */}
-                  <div className="flex items-center justify-between sm:justify-end gap-3.5 pl-8 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-hairline">
+                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 pl-8 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-hairline">
                     {/* Active / Inactive Toggle Switch */}
                     <div className="flex items-center gap-2">
                       <button

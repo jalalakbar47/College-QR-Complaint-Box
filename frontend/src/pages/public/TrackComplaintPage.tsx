@@ -261,9 +261,9 @@ export const TrackComplaintPage: React.FC = () => {
                               >
                                 {isDone ? <Check className="w-3 h-3" /> : s.step}
                               </div>
-                              <span className="text-xs font-semibold truncate">{s.label}</span>
+                              <span className="text-xs font-semibold leading-tight">{s.label}</span>
                             </div>
-                            <span className="text-[10px] text-ink-muted block truncate font-sans relative z-10">{s.desc}</span>
+                            <span className="text-[10px] text-ink-muted block leading-tight font-sans relative z-10">{s.desc}</span>
                           </div>
                         );
                       })}

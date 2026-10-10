@@ -80,7 +80,7 @@ export const SubmissionSuccessPage: React.FC = () => {
                   : { scale: [1, 1.04, 1], opacity: [0.9, 1, 1] }
               }
               transition={{ delay: 0.4, duration: 0.35, ease: MOTION_EASINGS.standardEase }}
-              className="font-mono text-xl sm:text-2xl font-bold text-registrar-blue bg-paper-recessed px-4 py-2.5 rounded-xl border border-hairline shadow-sm tracking-wider"
+              className="font-mono text-lg sm:text-2xl font-bold text-registrar-blue bg-paper-recessed px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-hairline shadow-sm tracking-wider break-all max-w-full text-center"
             >
               {complaintId}
             </motion.span>
@@ -110,30 +110,30 @@ export const SubmissionSuccessPage: React.FC = () => {
             <Button
               variant="primary"
               size="lg"
-              className="w-full text-sm font-medium py-3.5 shadow-sm"
+              className="w-full text-sm font-medium py-3.5 shadow-sm min-h-[44px]"
               leftIcon={<Search className="w-4 h-4" />}
             >
               Track This Complaint
             </Button>
           </Link>
 
-          <div className="flex items-center gap-3">
-            <Link to="/complaint" className="flex-1">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link to="/complaint" className="w-full sm:flex-1">
               <Button
                 variant="secondary"
                 size="md"
-                className="w-full text-xs sm:text-sm"
+                className="w-full text-xs sm:text-sm min-h-[42px]"
                 leftIcon={<PlusCircle className="w-4 h-4" />}
               >
                 Submit Another
               </Button>
             </Link>
 
-            <Link to="/" className="flex-1">
+            <Link to="/" className="w-full sm:flex-1">
               <Button
                 variant="outline"
                 size="md"
-                className="w-full text-xs sm:text-sm"
+                className="w-full text-xs sm:text-sm min-h-[42px]"
                 leftIcon={<Home className="w-4 h-4" />}
               >
                 Return Home

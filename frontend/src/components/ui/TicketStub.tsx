@@ -57,20 +57,20 @@ export const TicketStub: React.FC<TicketStubProps> = ({
           {hasCustomHeader ? (
             headerContent
           ) : (
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
+            <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2.5 sm:gap-3">
+              <div className="min-w-0 flex-1">
                 {eyebrow && (
-                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-ink-muted font-medium mb-1">
+                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-ink-muted font-medium mb-0.5 sm:mb-1">
                     {eyebrow}
                   </p>
                 )}
                 {referenceId && (
-                  <p className="font-mono font-semibold text-ink-navy text-sm sm:text-base tracking-tight truncate">
+                  <p className="font-mono font-semibold text-ink-navy text-sm sm:text-base tracking-tight break-words">
                     {referenceId}
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0">
                 {statusPill ? (
                   statusPill
                 ) : status ? (

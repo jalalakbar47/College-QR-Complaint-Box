@@ -43,12 +43,12 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
       className="relative bg-paper-card rounded-xl border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-150 cursor-pointer"
     >
       {/* Top Part: ID + Status Pill */}
-      <div className="p-3.5 sm:p-4 flex items-center justify-between gap-2">
-        <div>
+      <div className="p-3.5 sm:p-4 flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2">
+        <div className="min-w-0">
           <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
             REFERENCE ID
           </span>
-          <span className="font-mono text-xs font-semibold text-ink-navy">
+          <span className="font-mono text-xs font-semibold text-ink-navy break-all">
             {complaint.complaint_id}
           </span>
         </div>
@@ -93,7 +93,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         </p>
 
         {/* Card Footer */}
-        <div className="pt-2.5 border-t border-hairline flex items-center justify-between gap-2 text-xs text-ink-muted">
+        <div className="pt-2.5 border-t border-hairline flex flex-wrap items-center justify-between gap-2 text-xs text-ink-muted">
           <div className="flex items-center gap-1 font-mono text-[11px]">
             <Calendar className="w-3.5 h-3.5" />
             <span>{formatDateTime(complaint.submitted_at)}</span>

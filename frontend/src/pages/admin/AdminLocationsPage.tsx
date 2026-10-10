@@ -294,14 +294,14 @@ export const AdminLocationsPage: React.FC = () => {
                       {/* Location Title & Block/Building Sub-line */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-ink-navy text-sm truncate">
+                          <h3 className="font-semibold text-ink-navy text-sm leading-snug">
                             {loc.location_name}
                           </h3>
                           <span className="font-mono text-[10px] text-ink-muted bg-paper-recessed px-1.5 py-0.5 rounded border border-hairline hidden md:inline-block">
                             {loc.location_id}
                           </span>
                         </div>
-                        <p className="text-xs text-ink-muted truncate mt-0.5 font-sans">
+                        <p className="text-xs text-ink-muted leading-tight mt-0.5 font-sans">
                           Block / Building:{' '}
                           <span className="text-ink-navy font-medium">{buildingName}</span>
                         </p>
@@ -309,7 +309,7 @@ export const AdminLocationsPage: React.FC = () => {
                     </div>
 
                     {/* Right Side: Direct Print Poster Button + Active Toggle + Edit & Delete Actions */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pl-8 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-hairline">
+                    <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 sm:gap-3 pl-8 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-hairline">
                       {/* Direct Print Poster Button */}
                       <Button
                         variant="secondary"

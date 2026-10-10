@@ -128,7 +128,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
           {/* Flyout Notification Panel */}
           {isOpen && (
-            <div className="absolute right-0 mt-2.5 w-80 sm:w-96 bg-paper-card rounded-xl shadow-lg border border-hairline overflow-hidden z-50 animate-fade-in">
+            <div className="absolute -right-2 sm:right-0 mt-2.5 w-[calc(100vw-32px)] max-w-sm sm:w-96 bg-paper-card rounded-xl shadow-lg border border-hairline overflow-hidden z-50 animate-fade-in">
               {/* Header */}
               <div className="px-4 py-3 bg-ink-navy text-white flex items-center justify-between">
                 <div className="flex items-center gap-2">

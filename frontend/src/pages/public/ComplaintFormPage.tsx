@@ -146,7 +146,7 @@ export const ComplaintFormPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Classification & Location */}
-          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-6 sm:p-7">
+          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-4 sm:p-6 lg:p-7">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
@@ -212,7 +212,7 @@ export const ComplaintFormPage: React.FC = () => {
           </Card>
 
           {/* Section 2: Details */}
-          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-6 sm:p-7">
+          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-4 sm:p-6 lg:p-7">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">
@@ -251,7 +251,7 @@ export const ComplaintFormPage: React.FC = () => {
           </Card>
 
           {/* Section 3: Identity & Anonymity Choice */}
-          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-6 sm:p-7">
+          <Card className="bg-paper-card border border-hairline shadow-sm rounded-2xl p-4 sm:p-6 lg:p-7">
             <CardHeader
               title={
                 <div className="flex items-center gap-2 text-ink-navy font-semibold text-base">

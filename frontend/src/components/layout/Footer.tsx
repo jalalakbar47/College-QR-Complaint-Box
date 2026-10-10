@@ -122,8 +122,8 @@ export const Footer: React.FC = () => {
                 <p className="font-semibold text-ink-navy text-xs">
                   Student Affairs &amp; Discipline Cell
                 </p>
-                <p className="text-[11px] text-ink-muted truncate font-sans">
-                  {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar'}
+                <p className="text-[11px] text-ink-muted leading-snug font-sans">
+                  {ENV.COLLEGE_NAME || 'Government Post Graduate College Khar District Bajaur'}
                 </p>
               </div>
             </div>
@@ -137,31 +137,31 @@ export const Footer: React.FC = () => {
 
         {/* Distinct Developer Attribution Strip */}
         <div
-          className="p-4 sm:p-5 rounded-2xl bg-ink-navy text-white border border-ink-navy shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="p-4 sm:p-5 rounded-2xl bg-ink-navy text-white border border-ink-navy shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ backgroundColor: '#101B36' }}
         >
-          <div className="flex items-center gap-3.5 text-center sm:text-left">
-            <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 text-seal-gold flex items-center justify-center flex-shrink-0">
-              <Code2 className="w-4.5 h-4.5" />
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+            <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-seal-gold flex items-center justify-center flex-shrink-0">
+              <Code2 className="w-5 h-5" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-medium text-slate-200 flex items-center justify-center sm:justify-start gap-1">
                 Designed &amp; Built with <Heart className="w-3.5 h-3.5 text-case-red fill-case-red inline mx-0.5" /> by
                 <span className="font-semibold text-white ml-0.5">Jalaluddin Khan</span>
               </p>
-              <p className="text-[11px] text-slate-400 font-mono">
+              <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                 Software Developer · BS Computer Science · @jalalakbar47 · GPGC Khar Bajaur
               </p>
             </div>
           </div>
 
           {/* Social Links */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto flex-shrink-0">
             <a
               href="https://github.com/jalalakbar47"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
               title="GitHub Profile"
             >
               <Github className="w-3.5 h-3.5" />
@@ -172,7 +172,7 @@ export const Footer: React.FC = () => {
               href="https://linkedin.com/in/jalalakbar47"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
               title="LinkedIn Profile"
             >
               <Linkedin className="w-3.5 h-3.5" />
@@ -181,7 +181,7 @@ export const Footer: React.FC = () => {
 
             <a
               href="mailto:jalalakbarbjr@gmail.com"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono font-medium text-slate-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
               title="Send Email"
             >
               <Mail className="w-3.5 h-3.5" />
@@ -191,7 +191,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Rights Bar */}
-        <div className="pt-2 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-ink-muted">
+        <div className="pt-2 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-ink-muted text-center sm:text-left">
           <p>© {new Date().getFullYear()} {ENV.COLLEGE_NAME || 'GPGC Khar District Bajaur'}. All rights reserved.</p>
           <p>Powered by React 18, TypeScript, Vite &amp; Google Apps Script</p>
         </div>
