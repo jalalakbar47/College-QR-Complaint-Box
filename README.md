@@ -143,44 +143,71 @@ College-QR-Compliant/
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Getting Started
 
-### 1. Clone & Install
+### 1. Download or Clone
+You can download this repository as a ZIP archive from GitHub and extract it, or clone it via git:
 ```bash
 git clone https://github.com/jalalakbar47/College-QR-Complaint-Box.git
 cd College-QR-Complaint-Box/frontend
 npm install
 ```
 
-### 2. Start Development Server
+### 2. Configure Environment & Branding
+Copy the provided `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+
+Customize `.env` with your own institution's branding and Apps Script Web App URL:
+```env
+# Google Apps Script Web App Deployment URL
+# Leave empty during local development to use interactive mock simulation.
+# For production, deploy your own Apps Script project and paste the Web App URL here:
+VITE_API_URL=
+
+# College Branding Configuration - customize for your own institution
+VITE_COLLEGE_NAME=Your Institution / University Name
+VITE_COLLEGE_SHORT_NAME=COLLEGE
+VITE_PORTAL_TITLE=College QR Complaint Box
+VITE_CAMPUS_PORTAL_URL=http://localhost:3000
+```
+
+### 3. Run Locally (Zero-Config Simulation Mode)
 ```bash
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 > [!TIP]
-> The app runs in **interactive simulation mode** by default with realistic seed records. You can submit complaints, track tickets, sign in as Chief Proctor, update statuses, test auditory alerts, and generate printable placards immediately without configuring Google Cloud!
+> The application includes an **interactive local simulation mode** by default. You can test submitting complaints, tracking tickets, signing in to the Chief Proctor ERP, changing statuses, and generating vector QR posters immediately without setting up any cloud backend!
 
-### 3. Default Administrative Credentials
+#### Default Admin Credentials (Local Mode):
 - **Email**: `chiefproctor@college.edu`
 - **Passkey**: `proctor2026`
 
 ---
 
-## ☁️ Connecting to Live Google Sheets (Production)
+## ☁️ Connecting Your Own Google Sheets & Apps Script Backend
 
-1. Open [Google Apps Script](https://script.google.com) and create a **New project**.
-2. Copy the entire contents of [`apps-script/Combined_Deploy.js`](./apps-script/Combined_Deploy.js) and paste into `Code.gs`.
-3. Select `setupDatabase` in the function toolbar and click **Run** *(creates and formats your Google Spreadsheet automatically)*.
-4. Click **Deploy > New deployment**:
-   - **Type**: Web app
+To connect the application to your own live Google Sheets database:
+
+1. Open [Google Sheets](https://sheets.new) and create a new blank spreadsheet.
+2. In the menu bar, navigate to **Extensions > Apps Script**.
+3. Copy the entire contents of [`apps-script/Combined_Deploy.js`](./apps-script/Combined_Deploy.js) and paste it into the script editor (replacing any existing code).
+4. In the Apps Script toolbar, select the function **`setupDatabase`** and click **Run**.
+   *(This automatically creates all 5 database sheets: `Complaints`, `Admins`, `Categories`, `Locations`, and `Activity_Log` with proper column headers and formatting).*
+5. Click **Deploy > New deployment**:
+   - **Select type**: Web app
+   - **Description**: Production API
    - **Execute as**: `Me`
    - **Who has access**: `Anyone`
-5. Copy the generated Web App URL and add it to `frontend/.env`:
+6. Click **Deploy**, authorize permissions, and copy your newly generated **Web App URL**.
+7. In your `frontend/.env`, set your Web App URL:
    ```env
-   VITE_API_URL=https://script.google.com/macros/s/AKfycbx.../exec
+   VITE_API_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
    ```
-6. Build for production:
+8. Build for production:
    ```bash
    cd frontend
    npm run build
@@ -205,8 +232,7 @@ npm run build
 ## 👨‍💻 Author & Developer
 
 **Jalaluddin Khan** ([@jalalakbar47](https://github.com/jalalakbar47))  
-*Software Developer • BS Computer Science*  
-*Government Post Graduate College (GPGC) Khar, District Bajaur*
+*Software Developer • BS Computer Science*
 
 - **GitHub**: [@jalalakbar47](https://github.com/jalalakbar47)
 - **LinkedIn**: [linkedin.com/in/jalalakbar47](https://linkedin.com/in/jalalakbar47)
